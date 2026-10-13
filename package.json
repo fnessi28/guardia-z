@@ -1,0 +1,9 @@
+{
+  "name": "guardia-z",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Shooter por turnos para estudiar Microbiología I",
+  "scripts": {
+    "dev": "npx --yes serve public -l 3000"
+  }
+}

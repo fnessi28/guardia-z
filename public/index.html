@@ -1,0 +1,1001 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Shooter por turnos para estudiar Microbiología: zombies-bacteria y hongos contra un arsenal de antibióticos.">
+<meta property="og:title" content="Guardia Z">
+<meta property="og:description" content="Estudiá microbiología jugando: cada paciente zombie es un bicho y tus armas son los antibióticos.">
+<meta name="theme-color" content="#0d1113">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%230d1113'/%3E%3Crect x='6' y='2' width='4' height='12' fill='%23e8e3d6'/%3E%3Crect x='7' y='0' width='2' height='3' fill='%23e8e3d6'/%3E%3Crect x='7' y='5' width='2' height='7' fill='%23ff5148'/%3E%3C/svg%3E">
+<title>Guardia Z</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;600;700&family=Chakra+Petch:wght@400;500;600;700&display=swap">
+<style>
+html,body{margin:0}
+[hidden]{display:none!important}
+img{max-width:100%}
+
+/* Layout: pasillo en primera persona arriba, consola de guardia (diálogo + arsenal) abajo o a la derecha en desktop. Look único oscuro, deliberado. */
+:root{
+  --bg:#0d1113; --panel:#151b1e; --panel2:#1c2428; --line:#2c383d;
+  --fg:#e8e3d6; --mute:#8f9c99; --accent:#ffb02e; --danger:#ff5148; --ok:#5ee38f;
+  --gpos:#8b5cf6; --gneg:#ec4899;
+  --f-display:"Pixelify Sans", "Courier New", monospace;
+  --f-body:"Chakra Petch", "Segoe UI", system-ui, sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{background:var(--bg);color:var(--fg)}
+body{font-family:var(--f-body);font-size:15px;line-height:1.45;padding-inline:16px;padding-block:14px}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+#app{max-width:1180px;margin:0 auto;display:grid;gap:14px;grid-template-columns:1fr}
+@media (min-width:980px){#app{grid-template-columns:1.35fr 1fr;align-items:start}}
+.col{display:grid;gap:10px;min-width:0}
+.topbar{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:baseline;font-family:var(--f-display);letter-spacing:.06em;text-transform:uppercase;font-size:13px;color:var(--mute)}
+.topbar b{color:var(--accent);font-weight:600}
+.topbar .sp{flex:1}
+.screen{position:relative;border:2px solid var(--line);background:#000;line-height:0}
+canvas{width:100%;height:auto;aspect-ratio:16/9;image-rendering:pixelated;display:block}
+.plate{position:absolute;left:10px;top:10px;line-height:1.2;background:rgba(10,14,16,.82);border:2px solid var(--line);padding:6px 10px 8px;min-width:min(240px,60%);max-width:70%}
+.pname{font-family:var(--f-display);font-size:16px;letter-spacing:.03em}
+.pname.unk{color:var(--mute)}
+.bar{height:8px;background:#2a1517;margin-top:5px;position:relative;overflow:hidden}
+.bar i{position:absolute;inset:0 auto 0 0;background:var(--danger);transition:width .35s}
+.ptags{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;font-size:11px;font-family:var(--f-display);letter-spacing:.05em;text-transform:uppercase}
+.chip{padding:1px 6px;border:1px solid var(--line);background:var(--panel)}
+.hud{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px 16px;background:var(--panel);border:2px solid var(--line);padding:10px 12px}
+.hud label{display:block;font-family:var(--f-display);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--mute)}
+.hud .val{font-family:var(--f-display);font-size:20px;font-variant-numeric:tabular-nums}
+.hud .bar{height:10px;margin-top:4px}
+#hpbar i{background:var(--ok)}
+#prbar{background:#2a2412} #prbar i{background:var(--accent)}
+.dialog{background:#0a0d0e;border:3px double var(--fg);padding:12px 14px;min-height:118px;display:grid;gap:8px;align-content:start}
+.dialog p{margin:0;max-width:70ch}
+.dialog p.old{color:var(--mute);font-size:13.5px}
+.dialog b{color:var(--accent);font-weight:600}
+.dialog .good{color:var(--ok)} .dialog .bad{color:var(--danger)}
+.actions{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.act{background:var(--panel2);border:2px solid var(--line);padding:10px 6px;font-family:var(--f-display);font-size:14px;letter-spacing:.06em;text-transform:uppercase;display:grid;gap:2px;justify-items:center}
+.act small{font-family:var(--f-body);font-size:11px;color:var(--mute);letter-spacing:0;text-transform:none}
+.act:hover:not(:disabled){border-color:var(--accent)}
+.act:disabled{opacity:.4;cursor:not-allowed}
+.arsenal{background:var(--panel);border:2px solid var(--line)}
+.tabs{display:flex;overflow-x:auto;border-bottom:2px solid var(--line)}
+.tab{flex:1 0 auto;background:none;border:0;padding:9px 10px;font-family:var(--f-display);font-size:12.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--mute);border-bottom:3px solid transparent;margin-bottom:-2px;display:flex;gap:6px;align-items:center;white-space:nowrap}
+.tab .sq{width:8px;height:8px;display:inline-block}
+.tab[aria-selected="true"]{color:var(--fg);border-bottom-color:var(--tc)}
+.wgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:8px;padding:10px}
+.wpn{background:var(--panel2);border:2px solid var(--line);padding:8px 10px;text-align:left;display:grid;grid-template-columns:auto 1fr auto;gap:2px 9px;align-items:start}
+.wpn:hover:not(:disabled){border-color:var(--tc)}
+.wpn:disabled{opacity:.35;cursor:not-allowed}
+.wpn .ic{grid-row:span 2;width:12px;height:22px;margin-top:3px;background:var(--tc);box-shadow:inset 0 -6px 0 rgba(0,0,0,.35)}
+.wpn .nm{font-weight:600;font-size:14px;line-height:1.2}
+.wpn .mc{grid-column:2/4;font-size:12px;color:var(--mute);line-height:1.3}
+.wpn .key{font-family:var(--f-display);font-size:11px;color:var(--mute)}
+.wpn .am{font-family:var(--f-display);font-size:11px;color:var(--accent)}
+.overlay{position:fixed;inset:0;background:rgba(5,7,8,.86);display:grid;place-items:center;padding:16px;z-index:10;overflow-y:auto}
+.box{background:var(--panel);border:3px double var(--fg);max-width:640px;width:100%;padding:20px;display:grid;gap:14px;max-height:calc(100vh - 32px);overflow-y:auto}
+.box h2{font-family:var(--f-display);font-size:26px;margin:0;line-height:1.1;text-wrap:balance;letter-spacing:.02em}
+.box h3{font-family:var(--f-display);font-size:14px;margin:0;color:var(--mute);letter-spacing:.12em;text-transform:uppercase;font-weight:400}
+.logo{font-family:var(--f-display);font-weight:700;font-size:clamp(48px,11vw,84px);line-height:.9;letter-spacing:.02em;color:var(--fg);text-shadow:4px 4px 0 #6b0f0f}
+.logo span{color:var(--danger);text-shadow:4px 4px 0 #3a0606}
+.lead{color:var(--mute);margin:0;max-width:56ch}
+.btns{display:grid;gap:8px}
+.btn{background:var(--panel2);border:2px solid var(--line);padding:11px 14px;text-align:left;display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.btn:hover{border-color:var(--accent)}
+.btn.main{border-color:var(--accent);background:#2a2110}
+.btn .t{font-family:var(--f-display);font-size:16px;letter-spacing:.04em}
+.btn .s{font-size:12.5px;color:var(--mute);text-align:right}
+.row2{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px}
+.how{font-size:13.5px;color:var(--mute);display:grid;gap:4px;margin:0;padding-left:18px}
+.how b{color:var(--fg);font-weight:600}
+.ficha{display:grid;gap:10px}
+.ficha dl{margin:0;display:grid;gap:9px}
+.ficha dt{font-family:var(--f-display);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+.ficha dd{margin:2px 0 0}
+.ficha .trap{border:2px dashed var(--danger);padding:8px 10px}
+.ficha .trap dt{color:var(--danger)}
+.stainrow{display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:13px;color:var(--mute)}
+.dot{width:12px;height:12px;display:inline-block;border:1px solid rgba(255,255,255,.3)}
+.bgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px}
+.bcard{background:var(--panel2);border:2px solid var(--line);padding:8px;text-align:left;display:grid;gap:3px;font-size:13px;line-height:1.25}
+.bcard.unseen{color:var(--mute);cursor:default}
+.bcard .bn{font-weight:600}
+.bcard .bs{font-size:11px;color:var(--mute);font-family:var(--f-display);letter-spacing:.06em}
+.dgrid{display:grid;gap:8px}
+.statline{display:flex;flex-wrap:wrap;gap:6px 18px;font-family:var(--f-display);font-size:14px;letter-spacing:.04em}
+.statline b{color:var(--accent);font-weight:600}
+@media (prefers-reduced-motion:reduce){.bar i{transition:none}}
+@media (max-width:520px){.actions{grid-template-columns:repeat(2,1fr)}.plate{min-width:0;max-width:78%;padding:4px 8px 6px}.pname{font-size:13px}}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="col">
+    <div class="topbar"><b id="floorLbl">Guardia Z</b><span id="roomLbl"></span><span class="sp"></span><span id="xpLbl">XP 0</span></div>
+    <div class="screen">
+      <canvas id="cv" width="320" height="180" aria-label="Pasillo del hospital con el paciente zombie"></canvas>
+      <div class="plate" id="plate" hidden>
+        <div class="pname unk" id="pname">???</div>
+        <div class="bar"><i id="ehp" style="width:100%"></i></div>
+        <div class="ptags" id="ptags"></div>
+      </div>
+    </div>
+    <div class="hud">
+      <div><label>Salud</label><div class="val" id="hpVal">100</div><div class="bar" id="hpbar"><i style="width:100%"></i></div></div>
+      <div><label>Presión de selección</label><div class="val" id="prVal">0%</div><div class="bar" id="prbar"><i style="width:0%"></i></div></div>
+      <div><label>Reserva hospitalaria</label><div class="val" id="ammoVal" style="font-size:14px;line-height:1.5"></div></div>
+    </div>
+    <div class="dialog" id="dlg" aria-live="polite"></div>
+  </div>
+  <div class="col">
+    <div class="actions">
+      <button class="act" id="bScan">Escanear<small>tinción y lab · S</small></button>
+      <button class="act" id="bDiag">Diagnosticar<small>+40% daño · D</small></button>
+      <button class="act" id="bHint">Pista<small>residente · P</small></button>
+      <button class="act" id="bBest">Bestiario<small>tu colección · B</small></button>
+    </div>
+    <div class="arsenal">
+      <div class="tabs" role="tablist" id="tabs"></div>
+      <div class="wgrid" id="wgrid"></div>
+    </div>
+  </div>
+</div>
+<div class="overlay" id="ov" hidden><div class="box" id="ovbox"></div></div>
+
+<script>
+/* ============ ARSENAL ============ */
+const TABS=[
+ {id:'pared',n:'Pared · membrana',c:'#f5c542'},
+ {id:'ribo',n:'Ribosoma',c:'#4cc3f0'},
+ {id:'adn',n:'ADN · folato',c:'#a6e04a'},
+ {id:'hongo',n:'Antifúngicos',c:'#38d6c0'},
+ {id:'sost',n:'Sin ATB',c:'#ff7a6b'}];
+const W=[
+ {id:'penG',n:'Penicilina G',tab:'pared',fam:'bl',mech:'Bloquea las PBP: no se arma el peptidoglicano, lisis'},
+ {id:'amoxi',n:'Amoxicilina / Ampicilina',tab:'pared',fam:'bl',mech:'Aminopenicilina: entra mejor en algunos Gram −'},
+ {id:'amoxiclav',n:'Amoxi-clavulánico',tab:'pared',fam:'bl',mech:'Amoxi + inhibidor de β-lactamasa',press:15},
+ {id:'oxa',n:'Oxacilina',tab:'pared',fam:'bl',mech:'Resiste la penicilinasa del estafilococo'},
+ {id:'cefa1',n:'Cefazolina / Cefalexina',tab:'pared',fam:'bl',mech:'Cefalosporina 1ª: sobre todo Gram +'},
+ {id:'ceftri',n:'Ceftriaxona',tab:'pared',fam:'bl',mech:'Cefalosporina 3ª: Gram − y pasa la BHE',press:20},
+ {id:'ceftaz',n:'Ceftazidima / Cefepime',tab:'pared',fam:'bl',mech:'Cefalosporina antipseudomónica',press:20},
+ {id:'mero',n:'Meropenem',tab:'pared',fam:'bl',mech:'Carbapenem: resiste casi toda β-lactamasa',press:35,ammo:3},
+ {id:'vanco',n:'Vancomicina',tab:'pared',fam:'gp',mech:'Se pega al D-Ala-D-Ala: frena la pared de Gram +',press:15,ammo:5},
+ {id:'colis',n:'Colistina',tab:'pared',fam:'poli',mech:'Polimixina: desarma el LPS de la membrana externa',press:30,ammo:2},
+ {id:'genta',n:'Gentamicina',tab:'ribo',fam:'amino',mech:'Aminoglucósido 30S: lectura errónea. Entra con O₂'},
+ {id:'macro',n:'Azitro / Claritromicina',tab:'ribo',fam:'macro',mech:'Macrólido 50S: frena la translocación'},
+ {id:'doxi',n:'Doxiciclina',tab:'ribo',fam:'tetra',mech:'Tetraciclina 30S: bloquea la entrada del ARNt'},
+ {id:'clinda',n:'Clindamicina',tab:'ribo',fam:'linco',mech:'50S: además frena la síntesis de toxinas',press:25},
+ {id:'cipro',n:'Cipro / Levofloxacina',tab:'adn',fam:'quino',mech:'Quinolona: inhibe ADN girasa y topoisomerasa IV',press:20},
+ {id:'tmp',n:'TMP-SMX',tab:'adn',fam:'fol',mech:'Doble bloqueo de la síntesis de folato'},
+ {id:'metro',n:'Metronidazol',tab:'adn',fam:'nitroimid',mech:'Se activa por reducción en anaerobios y rompe el ADN'},
+ {id:'nitro',n:'Nitrofurantoína',tab:'adn',fam:'uri',mech:'Se concentra en orina: daña ADN y ribosomas'},
+ {id:'ripe',n:'Esquema RIPE',tab:'adn',fam:'tb',mech:'Rifampicina · Isoniazida · Pirazinamida · Etambutol'},
+ {id:'anfo',n:'Anfotericina B',tab:'hongo',cls:'af',mech:'Polieno: se une al ergosterol y hace poros'},
+ {id:'fluco',n:'Fluconazol',tab:'hongo',cls:'af',mech:'Azol: frena la síntesis de ergosterol (14α-desmetilasa)'},
+ {id:'itra',n:'Itraconazol',tab:'hongo',cls:'af',mech:'Azol de elección en dimórficos'},
+ {id:'vori',n:'Voriconazol',tab:'hongo',cls:'af',mech:'Azol que cubre filamentosos'},
+ {id:'equino',n:'Caspofungina',tab:'hongo',cls:'af',mech:'Equinocandina: bloquea el β-1,3-glucano de la pared'},
+ {id:'terbi',n:'Terbinafina',tab:'hongo',cls:'af',mech:'Inhibe la escualeno epoxidasa; se acumula en queratina'},
+ {id:'nista',n:'Nistatina',tab:'hongo',cls:'af',mech:'Polieno tópico: no se absorbe'},
+ {id:'antitox',n:'Antitoxina / Inmunoglobulina',tab:'sost',cls:'sp',mech:'Neutraliza la toxina circulante (no la ya fijada)'},
+ {id:'sosten',n:'Sostén sin ATB',tab:'sost',cls:'sp',mech:'Rehidratar, soporte, no tirar antibióticos'}];
+const WBY=Object.fromEntries(W.map(w=>[w.id,w]));
+const TABC=Object.fromEntries(TABS.map(t=>[t.id,t.c]));
+
+/* ============ BESTIARIO ============ */
+const MECA='Gen mecA: fabrica PBP2a, con baja afinidad por TODOS los betalactámicos.';
+const CEF='Resistencia intrínseca a TODAS las cefalosporinas (PBP de baja afinidad).';
+const CEFL='Resistencia intrínseca a cefalosporinas. Por eso en meningitis del neonato o del mayor de 50 se suma ampicilina.';
+const PSEU='Resistencia intrínseca: porinas poco permeables, AmpC y bombas de eflujo.';
+const KPC='Carbapenemasa KPC: hidroliza penicilinas, cefalosporinas y carbapenémicos.';
+const CD='Más ATB de amplio espectro = más disbiosis = más C. difficile.';
+const PJ='Pneumocystis NO tiene ergosterol en la membrana (usa colesterol): ni polienos ni azoles le hacen nada.';
+
+const E=[
+/* ---------- PISO 1: GRAM + ---------- */
+{id:'saureus',n:'Staphylococcus aureus',f:1,stain:'pos',feats:['racimos','forunculo','escaldada'],
+ epi:'Post-operado con la herida supurando y fiebre.',
+ sint:'Cubierto de forúnculos amarillos en racimo; la piel se le despega a tiras.',
+ lab:'Cocos Gram + en RACIMOS. Catalasa +, coagulasa +. Colonias doradas β-hemolíticas.',
+ atk:[['Proteína A','se pega a la Fc de tu IgG: tus anticuerpos quedan al revés.'],['Toxina TSST-1','superantígeno: activa linfocitos T en masa, shock.'],['Exfoliatinas','cortan la desmogleína-1: piel escaldada.'],['Leucocidina PV','agujerea tus neutrófilos.']],
+ best:{oxa:'Oxacilina resiste la penicilinasa: es EL arma contra el SAMS.',cefa1:'Cefazolina: elección en SAMS, sobre todo en profilaxis quirúrgica.'},
+ ok:{clinda:'Clindamicina sirve en piel y partes blandas si es sensible.',tmp:'TMP-SMX: alternativa oral en piel.',amoxiclav:'El clavulánico frena la penicilinasa, pero es más amplio de lo necesario.',vanco:'Vancomicina mata, pero contra SAMS es INFERIOR a la oxacilina. Guardala para el SAMR.'},
+ res:{penG:'Penicilinasa (blaZ): más del 90% de las cepas destruye la penicilina.',amoxi:'La amoxicilina sola también cae ante la penicilinasa.'},
+ ficha:{m:'Coco Gram + en racimo, catalasa + y coagulasa +.',v:'Proteína A, coagulasa, TSST-1, exfoliatinas, enterotoxinas termoestables, leucocidina PV.',c:'Forúnculos, celulitis, osteomielitis, endocarditis (ADVP), shock tóxico, piel escaldada, intoxicación alimentaria.',t:'SAMS: oxacilina o cefazolina.',x:'La penicilina G casi nunca sirve: penicilinasa en más del 90%.'}},
+{id:'spyo',n:'Streptococcus pyogenes',f:1,stain:'pos',feats:['cadena','lengua','erisipela'],
+ epi:'Nene de 7 años con faringitis, fiebre y un rash áspero como papel de lija.',
+ sint:'Lengua aframbuesada, una placa roja de borde neto en la pierna y cadenas de cocos colgando de los brazos.',
+ lab:'Cocos Gram + en CADENA. Catalasa −. β-hemólisis completa. Sensible a bacitracina. Grupo A de Lancefield.',
+ atk:[['Proteína M','antifagocítica; mimetiza miocardio: fiebre reumática.'],['Estreptolisina O','perfora membranas (genera ASTO).'],['Toxina eritrogénica','superantígeno de la escarlatina.'],['Estreptoquinasa','disuelve coágulos para diseminarse.']],
+ best:{penG:'Penicilina: nunca se describió resistencia en S. pyogenes.',amoxi:'Amoxicilina 10 días: elección en faringitis, previene la fiebre reumática.'},
+ ok:{cefa1:'Cefalosporina 1ª: sirve.',macro:'Macrólido: para alérgicos, pero hay resistencia creciente.',clinda:'Clindamicina: en fascitis se suma para frenar la síntesis de toxinas.'},
+ ficha:{m:'Coco Gram + en cadena, β-hemolítico, grupo A, bacitracina sensible.',v:'Proteína M, cápsula de ácido hialurónico, estreptolisinas O y S, toxinas eritrogénicas, estreptoquinasa.',c:'Faringitis, escarlatina, impétigo, erisipela, fascitis necrotizante, shock tóxico. Secuelas: fiebre reumática y GNPE.',t:'Penicilina o amoxicilina.',x:'Erisipela: borde neto (dermis). Celulitis: borde difuso (dermis + TCS).'}},
+{id:'spneu',n:'Streptococcus pneumoniae',f:1,stain:'pos',feats:['capsula','herrumbre','tos'],
+ epi:'Hombre de 70 años: fiebre brusca con un único escalofrío y puntada de costado.',
+ sint:'Escupe esputo color herrumbre y lo rodea un escudo brillante: la cápsula.',
+ lab:'DIPLOCOCOS Gram + lanceolados. α-hemólisis. Sensible a optoquina, bilis soluble. Antígeno urinario +.',
+ atk:[['Cápsula','polisacárido antifagocítico: tus macrófagos resbalan.'],['Neumolisina','perfora membranas y activa complemento.'],['Autolisina','se rompe a sí mismo y libera más neumolisina.'],['IgA proteasa','corta tu IgA de mucosas.']],
+ best:{amoxi:'Amoxicilina en dosis altas: elección en NAC por neumococo.',ceftri:'Ceftriaxona: elección en meningitis o NAC grave (pasa la BHE).'},
+ ok:{penG:'Penicilina: sirve si la CIM lo permite.',macro:'Macrólido: alternativa en alérgicos, con resistencia.',cipro:'Levofloxacina (quinolona respiratoria) cubre; la cipro no tanto.'},
+ res:{genta:'Aminoglucósido solo: el neumococo es poco sensible, entra mal.'},
+ ficha:{m:'Diplococo Gram + lanceolado, α-hemolítico, optoquina sensible.',v:'Cápsula (más de 90 serotipos), neumolisina, autolisina, IgA proteasa.',c:'NAC típica, otitis media, sinusitis, meningitis del adulto, bacteriemia en esplenectomizados.',t:'Amoxicilina (NAC); ceftriaxona ± vancomicina en meningitis.',x:'Su resistencia es por PBP alteradas, NO por β-lactamasa: el clavulánico no agrega nada.'}},
+{id:'entero',n:'Enterococcus faecalis',f:1,stain:'pos',feats:['cadena','fuego'],
+ epi:'Mujer de 75 años sondada, con ITU que no mejora con ceftriaxona.',
+ sint:'Le arde todo por dentro y una cadena corta de cocos le cuelga de la panza.',
+ lab:'Cocos Gram + en pares o cadenas cortas. Catalasa −. Crece en bilis-esculina y en NaCl 6,5%. PYR +.',
+ atk:[['Resistencia intrínseca','se ríe de tus cefalosporinas.'],['Sustancia de agregación','se pega a las válvulas: endocarditis.'],['Biofilm','se atrinchera en la sonda.']],
+ best:{amoxi:'Ampicilina/amoxicilina: elección en E. faecalis. En endocarditis, + gentamicina por sinergia.'},
+ ok:{vanco:'Vancomicina: si hay alergia o resistencia a ampicilina.',nitro:'Nitrofurantoína: sirve en cistitis por enterococo.'},
+ res:{cefa1:CEF,ceftri:CEF,ceftaz:CEF,clinda:'Resistencia intrínseca a clindamicina.',tmp:'In vivo no sirve: toma folato del medio y esquiva el bloqueo.'},
+ ficha:{m:'Coco Gram + en cadena corta, catalasa −, crece en bilis y NaCl 6,5%.',v:'Sustancia de agregación, citolisina, biofilm, resistencia intrínseca.',c:'ITU en sondados, endocarditis subaguda, infección intraabdominal, bacteriemia nosocomial.',t:'Ampicilina (+ gentamicina en endocarditis). ERV: linezolid o daptomicina.',x:'Ninguna cefalosporina lo cubre: por eso emerge cuando tratás con ellas.'}},
+{id:'listeria',n:'Listeria monocytogenes',f:1,stain:'pos',feats:['cometa','queso'],
+ epi:'Embarazada de 30 semanas con fiebre, después de comer queso blando sin pasteurizar.',
+ sint:'Dispara cometas de actina por las manos y salta de célula en célula. Trae una cuña de queso.',
+ lab:'Cocobacilo Gram +. Movilidad en VOLTERETAS a 25 °C (no a 37). β-hemólisis débil, CAMP +. Crece en heladera.',
+ atk:[['Listeriolisina O','rompe el fagosoma y escapa al citoplasma.'],['ActA','arma una cola de actina: salta célula a célula sin salir afuera.'],['Internalinas','atraviesa la placenta y la BHE.']],
+ best:{amoxi:'Ampicilina (+ gentamicina): elección.'},
+ ok:{tmp:'TMP-SMX: alternativa en alérgicos a penicilina.',genta:'Gentamicina: se suma a la ampicilina por sinergia.'},
+ res:{cefa1:CEFL,ceftri:CEFL,ceftaz:CEFL},
+ ficha:{m:'Bacilo corto Gram +, móvil en volteretas a 25 °C, crece a 4 °C.',v:'Internalinas, listeriolisina O, ActA (cola de actina).',c:'Embarazadas (amnionitis, aborto), neonatos (sepsis, granulomatosis infantiséptica), ancianos e inmunodeprimidos (meningitis).',t:'Ampicilina ± gentamicina.',x:'Las cefalosporinas no sirven: en meningitis de neonato o mayor de 50 se agrega ampicilina.'}},
+{id:'difteria',n:'Corynebacterium diphtheriae',f:1,stain:'pos',feats:['cuellotoro','pseudomembrana'],
+ epi:'Adulto sin vacunar: dolor de garganta, fiebre baja y el cuello hinchado.',
+ sint:'Cuello de toro y una membrana gris pegada a la garganta que sangra si la arrancás.',
+ lab:'Bacilos Gram + en LETRAS CHINAS. Gránulos metacromáticos. Agar telurito: colonias negras. Test de Elek para la toxina.',
+ atk:[['Toxina diftérica','ADP-ribosila el EF-2: tus células dejan de fabricar proteínas.'],['Pseudomembrana','te tapa la vía aérea.'],['Miocarditis','la toxina llega al corazón.']],
+ best:{antitox:'Antitoxina diftérica: neutraliza la toxina circulante. Va primero, sin esperar el cultivo.',macro:'Eritromicina: erradica el bacilo y corta la producción de toxina.'},
+ ok:{penG:'Penicilina: erradica el bacilo, acompaña a la antitoxina.'},
+ ficha:{m:'Bacilo Gram + pleomórfico en letras chinas, gránulos metacromáticos.',v:'Toxina diftérica, codificada por un fago β; inactiva el EF-2.',c:'Difteria faríngea con pseudomembrana, cuello de toro, miocarditis, neuritis.',t:'Antitoxina + eritromicina o penicilina. Prevención: toxoide en la vacuna.',x:'Solo las cepas lisogenizadas por el fago β producen toxina.'}},
+{id:'samr',n:'SAMR',f:1,boss:true,stain:'pos',feats:['racimos','forunculo','cateter','boss'],
+ epi:'Dos semanas en UTI con catéter central. Hemocultivos positivos y fiebre que no cede.',
+ sint:'Un gigante de racimos de pus con armadura brillante: las penicilinas le rebotan.',
+ lab:'Cocos Gram + en racimo, coagulasa +. Antibiograma: RESISTENTE a oxacilina (gen mecA).',
+ atk:[['PBP2a','transpeptidasa nueva que ningún betalactámico frena.'],['Toxina TSST-1','superantígeno: shock.'],['Biofilm','se aferra al catéter.'],['Leucocidina PV','necrosis de tus neutrófilos.']],
+ best:{vanco:'Vancomicina se pega al D-Ala-D-Ala y esquiva la PBP2a. Elección en SAMR invasivo.'},
+ ok:{tmp:'TMP-SMX: opción en SAMR de la comunidad en piel.',clinda:'Clindamicina: sirve en SAMR-AC si el test D da negativo.',doxi:'Doxiciclina: alternativa oral en piel por SAMR-AC.'},
+ res:{penG:MECA,amoxi:MECA,amoxiclav:MECA,oxa:MECA,cefa1:MECA,ceftri:MECA,ceftaz:MECA,mero:MECA},
+ ficha:{m:'S. aureus resistente a meticilina (oxacilina).',v:'PBP2a (gen mecA en el cassette SCCmec) + todo el arsenal de S. aureus.',c:'Bacteriemia asociada a catéter, neumonía, osteomielitis. Hospitalario o de la comunidad (con leucocidina PV).',t:'Vancomicina (alternativas: linezolid, daptomicina).',x:'SAMR = resistente a TODOS los betalactámicos (salvo ceftarolina), no solo a la oxacilina.'}},
+
+/* ---------- PISO 2: GRAM − ---------- */
+{id:'ecoli',n:'Escherichia coli uropatógena',f:2,stain:'neg',feats:['fuego','fimbrias'],
+ epi:'Mujer joven sana: ardor al orinar y ganas de ir a cada rato. Sin fiebre.',
+ sint:'Le sale fuego de la vejiga y está cubierta de pelitos pegajosos: las fimbrias.',
+ lab:'Bacilo Gram −. Lactosa + en MacConkey (colonias rosas). Indol +. Urocultivo con más de 100.000 UFC/ml.',
+ atk:[['Fimbrias P','se adhieren al uroepitelio y suben al riñón.'],['Hemolisina','rompe tus células.'],['Vía ascendente','sube por la uretra corta.']],
+ best:{nitro:'Nitrofurantoína: elección en cistitis no complicada; se concentra en orina.'},
+ ok:{cefa1:'Cefalexina: opción oral en cistitis.',tmp:'TMP-SMX: solo si la resistencia local es baja (en Argentina suele ser alta).',ceftri:'Ceftriaxona: para pielonefritis. En cistitis es de más.',cipro:'Quinolona: guardala para pielonefritis, no para cistitis simple.',amoxiclav:'Amoxi-clavulánico: sirve, pero es amplio de más.'},
+ res:{amoxi:'β-lactamasa TEM: más de la mitad de las cepas resiste a la amoxicilina sola.'},
+ ficha:{m:'Bacilo Gram −, enterobacteria, lactosa +, indol +.',v:'Fimbrias P (pielonefritis), fimbrias tipo 1, hemolisina, LPS.',c:'Primera causa de ITU, sepsis de foco urinario, meningitis neonatal (cápsula K1).',t:'Cistitis: nitrofurantoína o fosfomicina. Pielonefritis: ceftriaxona o quinolona según antibiograma.',x:'Orina del chorro medio con higiene previa; si no, cultivás la flora.'}},
+{id:'eceh',n:'E. coli O157:H7 (ECEH)',f:2,stain:'neg',feats:['sangre','bomba'],
+ epi:'Nene de 3 años que comió hamburguesa poco cocida. Diarrea con sangre, SIN fiebre.',
+ sint:'Deja un charco de diarrea sanguinolenta y lleva una bomba de toxina en el pecho.',
+ lab:'Bacilo Gram −. NO fermenta sorbitol (colonias incoloras en MacConkey-sorbitol). Serotipo O157:H7. Toxina Shiga +.',
+ atk:[['Toxina Shiga','frena los ribosomas del endotelio glomerular.'],['Intimina','borra tus microvellosidades.'],['SUH','anemia hemolítica + plaquetopenia + insuficiencia renal.']],
+ best:{sosten:'Correcto: hidratación y soporte, sin ATB. Así no liberás más toxina.'},
+ allAb:'¡Lo lisaste y largó una ola de toxina Shiga! Los ATB AUMENTAN el riesgo de síndrome urémico hemolítico.',abHurt:10,
+ ficha:{m:'Bacilo Gram −, E. coli O157:H7, sorbitol negativo.',v:'Toxina Shiga (Stx1/Stx2), intimina (lesión de adherencia y borrado).',c:'Colitis hemorrágica sin fiebre; en niños puede evolucionar a SUH. Argentina tiene la incidencia de SUH más alta del mundo.',t:'Sostén: hidratación y control renal. NO antibióticos ni antidiarreicos.',x:'Dar ATB acá empeora: más toxina liberada.'}},
+{id:'kleb',n:'Klebsiella pneumoniae',f:2,stain:'neg',feats:['grosella','capsula'],
+ epi:'Alcohólico crónico de 58 años con neumonía del lóbulo superior derecho.',
+ sint:'Escupe jalea de grosella sin parar, envuelto en una cápsula mucosa gigante.',
+ lab:'Bacilo Gram − INMÓVIL. Lactosa +. Colonias MUCOSAS que se estiran como hilo. Cápsula enorme.',
+ atk:[['Cápsula','gruesa y antifagocítica.'],['LPS','endotoxina: fiebre y shock.'],['Necrosis','te cavita el pulmón.']],
+ best:{ceftri:'Ceftriaxona: elección en Klebsiella de la comunidad sin BLEE.'},
+ ok:{amoxiclav:'El clavulánico frena la SHV-1: sirve.',cipro:'Quinolona: alternativa.',genta:'Aminoglucósido: sirve, mejor asociado.',tmp:'TMP-SMX: según antibiograma.',mero:'Carbapenem: lo mata, pero es para BLEE. Gastaste munición de reserva.'},
+ res:{amoxi:'β-lactamasa SHV-1 cromosómica: RESISTENCIA NATURAL a ampicilina y amoxicilina.',penG:'Resistencia natural a penicilinas (SHV-1).'},
+ ficha:{m:'Bacilo Gram − inmóvil, lactosa +, muy capsulado.',v:'Cápsula, LPS, sideróforos, β-lactamasa SHV-1 cromosómica.',c:'Neumonía en alcohólicos y diabéticos (jalea de grosella, lóbulo superior), ITU, infecciones nosocomiales.',t:'Ceftriaxona si es sensible; carbapenem si es BLEE.',x:'Siempre resistente a ampicilina, de nacimiento.'}},
+{id:'pseudo',n:'Pseudomonas aeruginosa',f:2,stain:'neg',feats:['verde','quemadura'],
+ epi:'Gran quemado internado hace 10 días: la herida se puso verde y huele a uva.',
+ sint:'Brilla verde fosforescente, huele a uva y tiene la piel quemada.',
+ lab:'Bacilo Gram − NO fermentador (lactosa −). OXIDASA +. Pigmento verde-azulado. Aerobio estricto.',
+ atk:[['Exotoxina A','inactiva el EF-2, igual que la diftérica.'],['Piocianina','te llena de radicales libres.'],['Alginato','biofilm mucoso.'],['Elastasa','digiere tus tejidos.']],
+ best:{ceftaz:'Ceftazidima/cefepime: antipseudomónicas. Elección (junto con piperacilina-tazobactam).'},
+ ok:{cipro:'Ciprofloxacina: la única opción oral antipseudomónica.',genta:'Aminoglucósido: se asocia en infección grave.',mero:'Meropenem: cubre, pero es tu munición de reserva.',colis:'Colistina: último recurso en multirresistente.'},
+ res:{ceftri:'La ceftriaxona NO cubre Pseudomonas. Error clásico de examen.',amoxi:PSEU,amoxiclav:PSEU,cefa1:PSEU,penG:PSEU,tmp:'Resistencia intrínseca a TMP-SMX.'},
+ ficha:{m:'Bacilo Gram − no fermentador, oxidasa +, aerobio estricto, pigmentado.',v:'Exotoxina A, exoenzima S, elastasa, piocianina, alginato (biofilm), pili.',c:'Quemados, fibrosis quística, neumonía asociada a ARM, otitis externa maligna en diabéticos, ectima gangrenoso, ITU por sonda.',t:'Ceftazidima, cefepime, piperacilina-tazobactam o carbapenem; ± aminoglucósido.',x:'La ceftriaxona no la cubre.'}},
+{id:'menin',n:'Neisseria meningitidis',f:2,stain:'neg',feats:['petequias','capsula'],
+ epi:'Conscripto de 18 años: fiebre, rigidez de nuca y manchas violáceas que no se borran al apretar.',
+ sint:'Cubierto de petequias que se vuelven púrpura en tiempo real. Cuello duro como un palo.',
+ lab:'LCR turbio. DIPLOCOCOS Gram − arriñonados, intra y extracelulares. Oxidasa +. Fermenta glucosa y MALTOSA.',
+ atk:[['LOS','endotoxina potente: shock y CID.'],['Waterhouse-Friderichsen','hemorragia suprarrenal bilateral.'],['Cápsula','antifagocítica.']],
+ best:{ceftri:'Ceftriaxona: elección empírica en meningitis bacteriana; cruza la BHE inflamada.'},
+ ok:{penG:'Penicilina G: sirve si se confirma sensible.'},
+ ficha:{m:'Diplococo Gram − arriñonado, oxidasa +, glucosa y maltosa +.',v:'Cápsula polisacárida, LOS (endotoxina), pili, IgA proteasa.',c:'Meningitis, meningococcemia, púrpura fulminante, Waterhouse-Friderichsen. Brotes en cuarteles e internados.',t:'Ceftriaxona. Profilaxis a contactos: rifampicina, ciprofloxacina o ceftriaxona.',x:'Déficit de complemento terminal (C5-C9) = meningococo a repetición.'}},
+{id:'gono',n:'Neisseria gonorrhoeae',f:2,stain:'neg',feats:['secrecion'],
+ epi:'Hombre de 24 años: secreción uretral purulenta abundante, 3 días después de una relación sin preservativo.',
+ sint:'Chorrea pus amarillo como canilla abierta.',
+ lab:'DIPLOCOCOS Gram − dentro de los PMN de la secreción. Thayer-Martin. Oxidasa +, solo fermenta glucosa.',
+ atk:[['Pili','se adhieren y cambian de antígeno.'],['Proteína Opa','adherencia firme al epitelio.'],['IgA proteasa','rompe tu IgA de mucosas.']],
+ best:{ceftri:'Ceftriaxona IM: elección actual.'},
+ ok:{macro:'Azitromicina: se suma para cubrir Chlamydia, que suele venir junta.',doxi:'Doxiciclina: cubre a la Chlamydia acompañante, no al gonococo.'},
+ res:{penG:'Gonococo productor de penicilinasa: la penicilina ya no se usa.',cipro:'Resistencia a quinolonas altísima: abandonadas.'},
+ ficha:{m:'Diplococo Gram − intracelular en PMN, solo fermenta glucosa.',v:'Pili (variación antigénica), Opa, porinas, LOS, IgA proteasa.',c:'Uretritis purulenta, cervicitis, EPI, artritis séptica, oftalmía neonatal.',t:'Ceftriaxona IM + cobertura de Chlamydia.',x:'Secreción purulenta abundante = gonococo. Escasa y transparente = Chlamydia.'}},
+{id:'hib',n:'Haemophilus influenzae tipo b',f:2,stain:'neg',feats:['capsula','babeo'],
+ epi:'Nene de 2 años SIN vacunar: fiebre alta, babea, sentado inclinado hacia adelante.',
+ sint:'Babea a chorros, no puede tragar y se sienta en trípode.',
+ lab:'COCOBACILO Gram − pleomórfico. Necesita factores X (hemina) y V (NAD): agar chocolate o SATELITISMO junto a S. aureus.',
+ atk:[['Cápsula PRP','antifagocítica; base de la vacuna conjugada.'],['Epiglotitis','te cierra la vía aérea.'],['IgA proteasa','corta tu IgA.']],
+ best:{ceftri:'Ceftriaxona: elección en Hib invasivo.'},
+ ok:{amoxiclav:'Amoxi-clavulánico: sirve en otitis y sinusitis.',cipro:'Quinolona: alternativa en adultos.'},
+ res:{amoxi:'Muchas cepas producen β-lactamasa TEM-1: la amoxicilina sola falla.'},
+ ficha:{m:'Cocobacilo Gram −, requiere factores X y V.',v:'Cápsula PRP (tipo b), IgA proteasa, LOS.',c:'Tipo b: meningitis, epiglotitis, celulitis, artritis en menores de 5 (raro desde la vacuna). No tipificables: otitis, sinusitis, EPOC.',t:'Ceftriaxona. Profilaxis de contactos: rifampicina.',x:'Satelitismo: S. aureus le regala el factor V al hemolizar.'}},
+{id:'typhi',n:'Salmonella Typhi',f:2,stain:'neg',feats:['roseola','fiebre'],
+ epi:'Volvió de viaje: fiebre que sube en escalera durante una semana, con pulso lento.',
+ sint:'Manchas rosadas en el abdomen y 40 °C de fiebre con bradicardia relativa.',
+ lab:'Bacilo Gram − MÓVIL. Lactosa −. H2S + (colonias de centro negro en agar SS). Hemocultivo + la 1ª semana.',
+ atk:[['Antígeno Vi','cápsula que lo esconde.'],['Placas de Peyer','invade y puede perforarte el íleon.'],['Portador','se esconde en la vesícula.']],
+ best:{ceftri:'Ceftriaxona: elección en fiebre tifoidea grave.'},
+ ok:{cipro:'Quinolona: sirve si es sensible (resistencia creciente).',macro:'Azitromicina: opción oral en no complicada.',tmp:'TMP-SMX: según antibiograma.'},
+ ficha:{m:'Bacilo Gram − móvil, lactosa −, H2S +.',v:'Antígeno Vi capsular, invasión de placas de Peyer, sobrevida en macrófagos.',c:'Fiebre tifoidea: fiebre escalonada, bradicardia relativa, roséola, hepatoesplenomegalia, perforación intestinal. Portador crónico en vesícula.',t:'Ceftriaxona, quinolona o azitromicina.',x:'Hemocultivo la 1ª semana; coprocultivo y urocultivo después.'}},
+{id:'shigella',n:'Shigella',f:2,stain:'neg',feats:['sangre','moco'],
+ epi:'Brote en un jardín de infantes: fiebre, cólicos y pujos. Con muy pocas bacterias alcanza.',
+ sint:'Va dejando un rastro de diarrea con sangre, moco y pus, con tenesmo constante.',
+ lab:'Bacilo Gram − INMÓVIL. Lactosa −. H2S − (la diferencia de Salmonella). Leucocitos en materia fecal.',
+ atk:[['Invasión por células M','entra por las placas de Peyer y se esparce hacia los costados.'],['Toxina Shiga','daña el epitelio colónico.'],['Dosis infectante mínima','con 10 a 100 bacilos alcanza.']],
+ best:{cipro:'Ciprofloxacina: elección en adultos; acorta la diarrea y el contagio.',macro:'Azitromicina: elección en niños.'},
+ ok:{ceftri:'Ceftriaxona: en casos graves.',tmp:'TMP-SMX: solo si es sensible.'},
+ res:{amoxi:'Resistencia alta a ampicilina.'},
+ ficha:{m:'Bacilo Gram − inmóvil, lactosa −, H2S −.',v:'Invasión celular (plásmido de virulencia), toxina Shiga en S. dysenteriae.',c:'Síndrome disentérico: fiebre, cólicos, tenesmo, heces con sangre, moco y pus.',t:'Quinolona o azitromicina + hidratación.',x:'Dosis infectante bajísima: brotes en jardines e instituciones.'}},
+{id:'vibrio',n:'Vibrio cholerae',f:2,stain:'neg',feats:['aguaarroz','deshidratado'],
+ epi:'Después de una inundación tomó agua no potable. Diarrea profusa, sin dolor ni fiebre.',
+ sint:'Se deshace en litros de diarrea agua de arroz. Ojos hundidos, piel de pasa.',
+ lab:'Bacilo Gram − CURVO en coma, muy móvil. Oxidasa +. Agar TCBS: colonias amarillas.',
+ atk:[['Toxina colérica','activa la adenilato ciclasa: sube el AMPc y salen cloro y agua a chorros.'],['Pili TCP','coloniza el intestino delgado.'],['Deshidratación','hasta 20 litros por día.']],
+ best:{sosten:'Rehidratación (oral o EV): es lo que le salva la vida.'},
+ ok:{doxi:'Doxiciclina dosis única: acorta la diarrea y la excreción. Complementa, no reemplaza.',macro:'Azitromicina: en niños y embarazadas.',cipro:'Ciprofloxacina: alternativa.'},
+ ficha:{m:'Bacilo Gram − curvo, oxidasa +, colonias amarillas en TCBS.',v:'Toxina colérica (A-B, sube el AMPc), pili TCP; genes en el fago CTXφ.',c:'Diarrea acuosa profusa agua de arroz, deshidratación grave, sin fiebre ni sangre.',t:'Rehidratación primero. ATB como complemento.',x:'Diarrea secretora pura: no hay leucocitos en materia fecal.'}},
+{id:'legio',n:'Legionella pneumophila',f:2,stain:'neg',flags:{intracel:1},feats:['tos','confuso','goteo'],
+ epi:'Hombre de 65, fumador, volvió de un hotel con aire acondicionado central.',
+ sint:'Neumonía + diarrea + confusión. Gotea agua de la torre de enfriamiento.',
+ lab:'Bacilo Gram − que se tiñe MAL. Crece solo en BCYE (cisteína y hierro). Antígeno urinario +. Hiponatremia.',
+ atk:[['Vida intracelular','se multiplica dentro de tus macrófagos alveolares.'],['Aerosoles','viaja en gotitas de agua.'],['Hiponatremia','te deja confuso.']],
+ best:{macro:'Azitromicina: entra a la célula. Elección.',cipro:'Levofloxacina: elección, gran penetración intracelular.'},
+ ok:{doxi:'Doxiciclina: alternativa.'},
+ ficha:{m:'Bacilo Gram − que se tiñe poco, crece en BCYE, intracelular facultativo.',v:'Supervivencia en macrófagos (inhibe la fusión fagolisosoma).',c:'Enfermedad del legionario (neumonía grave + diarrea + hiponatremia + confusión) y fiebre de Pontiac.',t:'Azitromicina o levofloxacina.',x:'No se contagia de persona a persona: es por aerosoles de agua.'}},
+{id:'hpylori',n:'Helicobacter pylori',f:2,stain:'neg',feats:['ulcera','espiral'],
+ epi:'Dolor epigástrico que mejora al comer. Endoscopía: úlcera duodenal.',
+ sint:'Un bicho en espiral con taladro, flotando en una nube de amoníaco.',
+ lab:'Bacilo Gram − espiralado, microaerófilo. UREASA muy positiva: test del aliento y test rápido en la biopsia.',
+ atk:[['Ureasa','urea a amoníaco: neutraliza el ácido.'],['CagA','inyectada en tu célula: inflamación y riesgo de cáncer.'],['VacA','vacuoliza el epitelio.']],
+ best:{macro:'Claritromicina: pilar del esquema triple (IBP + claritromicina + amoxicilina).'},
+ ok:{amoxi:'Amoxicilina: segundo ATB del esquema triple.',metro:'Metronidazol: reemplaza a la amoxicilina en alérgicos.',doxi:'Tetraciclina: parte de la cuádruple con bismuto.'},
+ ficha:{m:'Bacilo Gram − espiralado, flagelado, microaerófilo, ureasa +.',v:'Ureasa, flagelos, CagA, VacA, adhesinas.',c:'Gastritis crónica, úlcera duodenal y gástrica, adenocarcinoma gástrico, linfoma MALT.',t:'IBP + claritromicina + amoxicilina 14 días, o cuádruple con bismuto.',x:'Un ATB solo no alcanza: siempre esquema combinado con IBP.'}},
+{id:'kpc',n:'Klebsiella KPC',f:2,boss:true,stain:'neg',feats:['grosella','capsula','cateter','boss'],
+ epi:'25 días en UTI con ARM, ya recibió carbapenémicos. Fiebre y shock.',
+ sint:'Una Klebsiella mutante con escudo de carbapenemasa: se come los carbapenémicos.',
+ lab:'Bacilo Gram − lactosa +. Test con ácido borónico +: CARBAPENEMASA tipo KPC.',
+ atk:[['Carbapenemasa KPC','hidroliza casi todos los betalactámicos.'],['Plásmidos','le pasa la resistencia a otras enterobacterias.'],['Shock séptico','LPS a fondo.']],
+ best:{colis:'Colistina desarma el LPS: una de las pocas armas que quedan (hoy se suma ceftazidima-avibactam).'},
+ ok:{genta:'Aminoglucósido: a veces conserva sensibilidad; se asocia.'},
+ res:{penG:KPC,amoxi:KPC,amoxiclav:KPC,oxa:KPC,cefa1:KPC,ceftri:KPC,ceftaz:KPC,mero:KPC,cipro:'Los plásmidos KPC suelen traer co-resistencia a quinolonas.'},
+ ficha:{m:'Klebsiella pneumoniae con carbapenemasa KPC plasmídica.',v:'Lo de Klebsiella + KPC transferible por plásmidos.',c:'Infecciones nosocomiales graves en UTI: neumonía asociada a ARM, bacteriemia.',t:'Colistina, ceftazidima-avibactam o combinaciones según antibiograma.',x:'Nace del uso excesivo de carbapenémicos: presión de selección.'}},
+
+/* ---------- PISO 3: ANAEROBIOS Y ATÍPICOS ---------- */
+{id:'tetani',n:'Clostridium tetani',f:3,stain:'pos',flags:{anaerobio:1},feats:['risa','opistotonos'],
+ epi:'Jardinero que se clavó un clavo oxidado y no tiene la antitetánica al día.',
+ sint:'Risa sardónica congelada, mandíbula trabada y la espalda arqueada hacia atrás.',
+ lab:'Bacilo Gram + ANAEROBIO con espora TERMINAL redonda, en palillo de tambor. El diagnóstico es clínico.',
+ atk:[['Tetanospasmina','bloquea la liberación de GABA y glicina en la médula: espasmo.'],['Trismus','te cierra la mandíbula.'],['Espasmo laríngeo','te deja sin aire.']],
+ best:{antitox:'Inmunoglobulina antitetánica: neutraliza la toxina libre (la ya fijada no).',metro:'Metronidazol: elección para matar al bacilo anaerobio.'},
+ ok:{penG:'Penicilina G: alternativa (en teoría potencia la excitabilidad por antagonismo GABA).'},
+ ficha:{m:'Bacilo Gram + anaerobio estricto, espora terminal en palillo de tambor.',v:'Tetanospasmina (bloquea la liberación de GABA y glicina), tetanolisina.',c:'Trismus, risa sardónica, opistótonos, espasmos generalizados, tétanos neonatal.',t:'Ig antitetánica + metronidazol + toilette de la herida + sostén. Vacuna con toxoide.',x:'Tener tétanos no deja inmunidad: hay que vacunar igual.'}},
+{id:'botu',n:'Clostridium botulinum',f:3,stain:'pos',flags:{anaerobio:1},feats:['paralisis','frasco'],
+ epi:'Comió morrones en conserva casera. A las 24 h: visión doble y párpados caídos.',
+ sint:'Se le cae todo de arriba para abajo: párpados, mandíbula, brazos. Parálisis flácida descendente.',
+ lab:'Bacilo Gram + ANAEROBIO esporulado (espora subterminal). Toxina en suero o en el alimento.',
+ atk:[['Toxina botulínica','corta las proteínas SNARE: no se libera acetilcolina.'],['Parálisis respiratoria','tu diafragma deja de funcionar.']],
+ best:{antitox:'Antitoxina botulínica: neutraliza la toxina circulante. Es lo central, más soporte ventilatorio.'},
+ ok:{penG:'Penicilina: solo en botulismo de herida, junto con desbridamiento.'},
+ res:{genta:'¡NO! Los aminoglucósidos potencian el bloqueo neuromuscular y empeoran la parálisis.'},
+ ficha:{m:'Bacilo Gram + anaerobio esporulado.',v:'Toxina botulínica: la más potente conocida, proteasa de SNARE.',c:'Alimentario (conservas caseras), del lactante (miel), de herida. Parálisis flácida descendente simétrica, sin fiebre y con conciencia lúcida.',t:'Antitoxina + soporte ventilatorio.',x:'En el lactante no se dan ATB: liberan más toxina en el intestino.'}},
+{id:'perfri',n:'Clostridium perfringens',f:3,stain:'pos',flags:{anaerobio:1},feats:['crepitacion','necrosis'],
+ epi:'Herida anfractuosa en un accidente rural; a las 24 h dolor brutal y la piel cruje.',
+ sint:'La pierna se le infla de burbujas de gas que crujen al tocarla. Músculo negro.',
+ lab:'Bacilo Gram + grande, en vagón, anaerobio. Casi nunca muestra esporas. Doble zona de hemólisis. Lecitinasa +.',
+ atk:[['Toxina α (lecitinasa)','destruye membranas: mionecrosis.'],['Gas','fermenta y diseca tus tejidos.'],['Enterotoxina','en carnes recalentadas: diarrea.']],
+ best:{penG:'Penicilina G en dosis altas + desbridamiento quirúrgico urgente.',clinda:'Clindamicina: se suma para frenar la síntesis de toxina α.'},
+ ok:{metro:'Metronidazol: cubre anaerobios, alternativa.',mero:'Carbapenem: cubre, pero es amplio de más.'},
+ ficha:{m:'Bacilo Gram + grande, inmóvil, anaerobio aerotolerante, doble hemólisis.',v:'Toxina α (lecitinasa o fosfolipasa C), toxina θ, enterotoxina.',c:'Gangrena gaseosa (mionecrosis), celulitis anaeróbica, intoxicación alimentaria, enteritis necrotizante.',t:'Desbridamiento quirúrgico + penicilina + clindamicina. Oxígeno hiperbárico.',x:'Sin cirugía no hay ATB que alcance.'}},
+{id:'cdiff',n:'Clostridioides difficile',f:3,stain:'pos',flags:{anaerobio:1},feats:['diarrea','pseudoabd'],
+ epi:'Internado que recibió clindamicina y ceftriaxona: ahora diarrea profusa con fiebre.',
+ sint:'Nace de una flora arrasada: diarrea verde y una armadura de pseudomembranas en la panza.',
+ lab:'Bacilo Gram + ANAEROBIO esporulado. Toxinas A y B (o PCR) en materia fecal. Colonoscopía: pseudomembranas.',
+ atk:[['Toxina A','enterotoxina: secreción e inflamación.'],['Toxina B','citotoxina: destruye el citoesqueleto.'],['Esporas','resisten el alcohol en gel: manos con agua y jabón.']],
+ best:{vanco:'Vancomicina ORAL: no se absorbe y actúa en la luz intestinal. Elección (o fidaxomicina).'},
+ ok:{metro:'Metronidazol: solo en casos leves si no hay otra opción.'},
+ res:{clinda:'La clindamicina es justamente la que lo seleccionó: le echás nafta al fuego.',ceftri:CD,cipro:CD,amoxiclav:CD,mero:CD,amoxi:CD},
+ ficha:{m:'Bacilo Gram + anaerobio esporulado.',v:'Toxina A (enterotoxina), toxina B (citotoxina), esporas resistentes.',c:'Diarrea asociada a ATB, colitis pseudomembranosa, megacolon tóxico.',t:'Suspender el ATB causante + vancomicina oral o fidaxomicina.',x:'Clásicamente por clindamicina, cefalosporinas y quinolonas.'}},
+{id:'bfrag',n:'Bacteroides fragilis',f:3,stain:'neg',flags:{anaerobio:1},feats:['absceso','olor'],
+ epi:'Post-operatorio de una perforación colónica: absceso intraabdominal de olor pútrido.',
+ sint:'Inflado de abscesos y envuelto en una nube verde de olor fétido.',
+ lab:'Bacilo Gram − ANAEROBIO, pleomórfico. Crece en presencia de bilis. Olor pútrido.',
+ atk:[['Cápsula','fabrica abscesos.'],['β-lactamasa','destruye tu penicilina.'],['Infección mixta','trae amigos aerobios.']],
+ best:{metro:'Metronidazol: elección en anaerobios por debajo del diafragma.'},
+ ok:{amoxiclav:'Amoxi-clavulánico: cubre, el clavulánico frena su β-lactamasa.',mero:'Carbapenem: cubre, es reserva.',clinda:'Clindamicina: resistencia creciente en B. fragilis.'},
+ res:{penG:'Produce β-lactamasa: resistente a penicilina.',amoxi:'Produce β-lactamasa: la amoxicilina sola no alcanza.'},
+ ficha:{m:'Bacilo Gram − anaerobio, pleomórfico, tolera bilis.',v:'Cápsula (abscesos), β-lactamasa.',c:'Abscesos intraabdominales, peritonitis post-perforación, abscesos pélvicos. Infecciones mixtas.',t:'Metronidazol + drenaje. Alternativas: β-lactámico + inhibidor, carbapenem.',x:'Aminoglucósidos nunca: no entran sin oxígeno.'}},
+{id:'trepo',n:'Treponema pallidum',f:3,stain:'oscuro',g:'-',feats:['chancro','rash'],
+ epi:'Úlcera genital indolora de bordes duros hace 3 semanas. Ahora, manchas en palmas y plantas.',
+ sint:'Un chancro limpio e indoloro y un rash cobrizo en palmas y plantas.',
+ lab:'Espiroqueta: NO se ve con Gram ni se cultiva. Microscopía de CAMPO OSCURO. Serología: VDRL + FTA-ABS.',
+ atk:[['Endoflagelos','se mueve en sacacorchos por tus tejidos.'],['Membrana lisa','casi sin antígenos expuestos.'],['Diseminación','llega a SNC, aorta y piel.']],
+ best:{penG:'Penicilina G benzatínica: elección. Nunca se describió resistencia.'},
+ ok:{doxi:'Doxiciclina: alternativa en alérgicos (no en embarazo).',ceftri:'Ceftriaxona: alternativa.'},
+ res:{macro:'Mutación en el ARNr 23S: resistencia extendida a azitromicina.'},
+ ficha:{m:'Espiroqueta fina, no cultivable, se ve con campo oscuro.',v:'Endoflagelos, membrana externa pobre en proteínas.',c:'Sífilis 1ª (chancro), 2ª (rash palmo-plantar, condilomas planos), latente, 3ª (gomas, aortitis, neurosífilis), congénita.',t:'Penicilina G benzatínica. Embarazada alérgica: desensibilizar.',x:'VDRL para seguimiento (baja con el tratamiento); FTA-ABS queda positiva de por vida.'}},
+{id:'lepto',n:'Leptospira interrogans',f:3,stain:'oscuro',g:'-',feats:['ojosrojos','ictericia','rata'],
+ epi:'Trabajador rural después de una inundación: caminó en agua con orina de rata.',
+ sint:'Ojos inyectados en sangre, piel amarilla y dolor de pantorrillas. Una rata lo sigue.',
+ lab:'Espiroqueta con extremos en GANCHO. Campo oscuro. Medio EMJH. Serología: microaglutinación (MAT).',
+ atk:[['Vasculitis','daña el endotelio de riñón e hígado.'],['Síndrome de Weil','ictericia + insuficiencia renal + hemorragias.'],['Mialgias','te destruye las pantorrillas.']],
+ best:{penG:'Penicilina G: elección en formas graves.',doxi:'Doxiciclina: elección en formas leves y como profilaxis.'},
+ ok:{ceftri:'Ceftriaxona: equivalente a penicilina en formas graves.'},
+ ficha:{m:'Espiroqueta fina con extremos en gancho, aerobia, medio EMJH.',v:'Motilidad, adhesión endotelial, LPS.',c:'Zoonosis: fase septicémica (fiebre, mialgias en pantorrillas, sufusión conjuntival) y fase inmune. Forma grave: enfermedad de Weil.',t:'Penicilina o ceftriaxona (grave); doxiciclina (leve).',x:'Reservorio: roedores que la eliminan por orina.'}},
+{id:'chlam',n:'Chlamydia trachomatis',f:3,stain:'nada',g:'-',flags:{intracel:1},feats:['secrecionclara'],
+ epi:'Mujer de 22 años asintomática; su pareja tiene secreción uretral escasa y transparente.',
+ sint:'Casi no da síntomas: apenas una gotita transparente. Se esconde dentro de las células.',
+ lab:'Intracelular OBLIGADA: no crece en medios inertes. Inclusiones con Giemsa. Diagnóstico por PCR.',
+ atk:[['Cuerpo elemental','forma infectante: entra a la célula.'],['Cuerpo reticular','se multiplica adentro, protegido.'],['EPI silenciosa','cicatriza trompas: infertilidad y ectópico.']],
+ best:{macro:'Azitromicina dosis única: entra a la célula.',doxi:'Doxiciclina 7 días: elección actual.'},
+ ok:{cipro:'Levofloxacina: alternativa.'},
+ ficha:{m:'Bacteria intracelular obligada (cuerpo elemental y reticular), pared casi sin peptidoglicano.',v:'Vida intracelular, inhibición de la fusión fagolisosoma.',c:'Uretritis no gonocócica, cervicitis, EPI, linfogranuloma venéreo (L1-L3), tracoma (A-C), conjuntivitis y neumonía neonatal.',t:'Doxiciclina o azitromicina.',x:'Secreción escasa y transparente; muchas veces asintomática.'}},
+{id:'myco',n:'Mycoplasma pneumoniae',f:3,stain:'nada',flags:{sinPared:1},feats:['tos','blando'],
+ epi:'Estudiante de 19 años con tos seca hace semanas; sigue yendo a cursar igual.',
+ sint:'Tose seco sin parar pero camina tranquilo: neumonía caminante. Sin pared, es una bolsa blanda.',
+ lab:'NO tiene pared: no se tiñe con Gram. Colonias en huevo frito. Crioaglutininas +. Infiltrado intersticial.',
+ atk:[['Adhesina P1','se pega al epitelio ciliado.'],['Peróxido','te daña las cilias.'],['Crioaglutininas','anemia hemolítica por frío.']],
+ best:{macro:'Azitromicina: elección. Sin pared, hay que atacar el ribosoma.'},
+ ok:{doxi:'Doxiciclina: alternativa en adultos.',cipro:'Levofloxacina: alternativa.'},
+ ficha:{m:'La bacteria de vida libre más chica, sin pared, con esteroles en la membrana.',v:'Adhesina P1, peróxido de hidrógeno.',c:'Neumonía atípica caminante en jóvenes, traqueobronquitis, anemia por crioaglutininas, eritema multiforme.',t:'Macrólido; doxiciclina o levofloxacina como alternativa.',x:'Sin pared: todos los betalactámicos son inútiles.'}},
+{id:'brucella',n:'Brucella',f:3,stain:'neg',flags:{intracel:1},feats:['sudor','vaca'],
+ epi:'Tambero que toma leche sin pasteurizar. Fiebre que va y viene hace semanas.',
+ sint:'Fiebre ondulante, transpira a mares con olor a paja mojada y le duele la columna.',
+ lab:'Cocobacilo Gram − chico, intracelular facultativo. Crece lento (hemocultivo prolongado). Serología: Rosa de Bengala, Huddleson.',
+ atk:[['Vida intracelular','se esconde en tus macrófagos.'],['Espondilitis','ataca la columna lumbar.'],['Recaída','vuelve si el tratamiento es corto.']],
+ best:{doxi:'Doxiciclina: base del tratamiento, siempre combinada (rifampicina o gentamicina) por 6 semanas.'},
+ ok:{genta:'Gentamicina: se combina con doxiciclina.',tmp:'TMP-SMX: en niños y embarazadas (con rifampicina).',ripe:'De este esquema solo te sirve la rifampicina, que se combina con doxiciclina.'},
+ ficha:{m:'Cocobacilo Gram − pequeño, intracelular facultativo, aerobio.',v:'Supervivencia intracelular en macrófagos, LPS poco endotóxico.',c:'Zoonosis: fiebre ondulante, sudoración profusa, artralgias, espondilitis, orquiepididimitis, hepatoesplenomegalia.',t:'Doxiciclina + rifampicina (o + gentamicina) por 6 semanas.',x:'Monoterapia = recaída: siempre combinar.'}},
+{id:'tbc',n:'Mycobacterium tuberculosis',f:3,boss:true,stain:'baar',flags:{myco:1},feats:['flaco','caverna','tosangre','boss'],
+ epi:'Tos de más de 15 días, sudoración nocturna, bajó 10 kg. Vive en un lugar hacinado.',
+ sint:'Esquelético, tose sangre y tiene una caverna en el pecho por donde pasa el viento.',
+ lab:'Bacilo ÁCIDO-ALCOHOL RESISTENTE: rojo con Ziehl-Neelsen. Löwenstein-Jensen: crece en 3 a 8 semanas. Aerobio estricto.',
+ atk:[['Factor cordón','inhibe la migración de tus neutrófilos.'],['Sulfátidos','impiden la fusión fagolisosoma.'],['Granuloma caseoso','necrosis que se vacía y te cava el pulmón.'],['Latencia','se esconde años en el granuloma.']],
+ best:{ripe:'RIPE: 2 meses los 4 y después 4 meses rifampicina + isoniazida. Combinado para no seleccionar resistentes.'},
+ ok:{cipro:'Levofloxacina: droga de 2ª línea para TB resistente, no de inicio.'},
+ ficha:{m:'Bacilo ácido-alcohol resistente, aerobio estricto, de crecimiento muy lento; pared rica en ácidos micólicos.',v:'Ácidos micólicos, factor cordón, sulfátidos, lipoarabinomanano, supervivencia en macrófagos.',c:'TB primaria (complejo de Ghon), reactivación en vértices con caverna, miliar, meníngea, mal de Pott.',t:'Isoniazida + rifampicina + pirazinamida + etambutol 2 meses, luego isoniazida + rifampicina 4 meses.',x:'La rifampicina tiñe de naranja orina y lágrimas; la isoniazida da neuropatía (dar B6).'}},
+
+/* ---------- PISO 4: HONGOS ---------- */
+{id:'calb',n:'Candida albicans',f:4,kind:'hongo',stain:'azul',feats:['muguet','pseudohifa'],
+ epi:'Paciente con HIV y placas blancas en la boca que se despegan con el bajalenguas.',
+ sint:'Boca llena de placas blancas como ricota; le brotan pseudohifas de los dedos.',
+ lab:'Levadura con PSEUDOHIFAS. Tubo germinativo + (2 h a 37 °C). CHROMagar: colonias verdes.',
+ atk:[['Transición levadura-hifa','la hifa invade el tejido.'],['Adhesinas','se pega a epitelios y catéteres.'],['Biofilm','se atrinchera en el catéter.']],
+ best:{fluco:'Fluconazol: elección en candidiasis orofaríngea, vaginal y en C. albicans sensible.'},
+ ok:{nista:'Nistatina tópica: muguet leve.',equino:'Equinocandina: elección en candidemia grave.',anfo:'Anfotericina: sirve, pero es tóxica de más.',vori:'Voriconazol: cubre, más amplio de lo necesario.',itra:'Itraconazol: alternativa.'},
+ ficha:{m:'Levadura que forma pseudohifas e hifas verdaderas; tubo germinativo +.',v:'Dimorfismo levadura-hifa, adhesinas, proteasas aspárticas, biofilm.',c:'Muguet, vulvovaginitis, esofagitis en HIV, intertrigo, candidemia por catéter.',t:'Fluconazol; equinocandina en candidemia grave.',x:'Es flora normal: hay que demostrar invasión.'}},
+{id:'ckru',n:'Candida krusei',f:4,kind:'hongo',stain:'azul',feats:['cateter','pseudohifa'],
+ epi:'Neutropénico en UTI que venía con fluconazol profiláctico. Candidemia que no responde.',
+ sint:'Una Candida que se come el fluconazol de desayuno. Cuelga de un catéter.',
+ lab:'Levadura. Tubo germinativo NEGATIVO. CHROMagar: colonias rosadas y secas.',
+ atk:[['Resistencia intrínseca','el fluconazol no le hace nada.'],['Candidemia','siembra todo el cuerpo.']],
+ best:{equino:'Caspofungina: elección en candidemia por especies no albicans.'},
+ ok:{anfo:'Anfotericina B: alternativa.',vori:'Voriconazol: suele conservar actividad.'},
+ res:{fluco:'C. krusei: RESISTENCIA INTRÍNSECA a fluconazol.'},
+ ficha:{m:'Levadura no albicans, tubo germinativo −.',v:'Biofilm, resistencia intrínseca a fluconazol.',c:'Candidemia en neutropénicos y en pacientes con fluconazol profiláctico.',t:'Equinocandina; anfotericina como alternativa.',x:'C. krusei es resistente natural al fluconazol; C. glabrata tiene sensibilidad disminuida.'}},
+{id:'crypto',n:'Cryptococcus neoformans',f:4,kind:'hongo',stain:'tinta',feats:['capsula','paloma'],
+ epi:'Paciente con HIV y CD4 de 50: cefalea de semanas, fiebre y confusión.',
+ sint:'Cabeza envuelta en una cápsula blanca gigante. Lo acompaña una paloma.',
+ lab:'TINTA CHINA en LCR: levaduras con un halo claro (CÁPSULA). Ureasa +. Antígeno capsular en LCR.',
+ atk:[['Cápsula','glucuronoxilomanano: antifagocítica e inmunosupresora.'],['Melanina','escudo antioxidante.'],['Hipertensión endocraneana','la cápsula tapa la reabsorción de LCR.']],
+ best:{anfo:'Anfotericina B (+ flucitosina): inducción en meningitis criptocócica.'},
+ ok:{fluco:'Fluconazol: consolidación y mantenimiento después de la anfotericina.'},
+ res:{equino:'Cryptococcus es intrínsecamente RESISTENTE a las equinocandinas.'},
+ ficha:{m:'Levadura capsulada, ureasa +, se ve con tinta china.',v:'Cápsula de glucuronoxilomanano, melanina, ureasa, crecimiento a 37 °C.',c:'Meningoencefalitis subaguda en HIV con CD4 menor a 100, neumonía, lesiones cutáneas.',t:'Anfotericina B + flucitosina, luego fluconazol.',x:'Las equinocandinas no sirven. Hay que controlar la presión del LCR con punciones.'}},
+{id:'asper',n:'Aspergillus fumigatus',f:4,kind:'hongo',stain:'azul',feats:['moho','bola'],mohoC:'#7fae6a',
+ epi:'Neutropénico post-quimio con fiebre que no cede con ATB. TAC: nódulo con signo del halo.',
+ sint:'Le brotan hifas verdes de la cabeza y tiene una bola de moho en el pulmón.',
+ lab:'Hifas TABICADAS, finas, ramificación dicotómica en ÁNGULO AGUDO (45°). Galactomanano +.',
+ atk:[['Angioinvasión','las hifas invaden vasos: infarto hemorrágico.'],['Gliotoxina','inmunosupresora.'],['Conidios','respirás miles por día.']],
+ best:{vori:'Voriconazol: elección en aspergilosis invasiva.'},
+ ok:{anfo:'Anfotericina B liposomal: alternativa.',equino:'Equinocandina: rescate o combinación.',itra:'Itraconazol: en aspergilosis crónica y ABPA.'},
+ res:{fluco:'Fluconazol NO cubre hongos filamentosos.'},
+ ficha:{m:'Hongo filamentoso hialino, hifas tabicadas con ramificación a 45°.',v:'Conidios pequeños, angioinvasión, gliotoxina.',c:'ABPA en asmáticos, aspergiloma (bola en una caverna previa), aspergilosis invasiva en neutropénicos.',t:'Voriconazol. Aspergiloma: cirugía.',x:'Mucor también es angioinvasor pero NO responde a voriconazol.'}},
+{id:'histo',n:'Histoplasma capsulatum',f:4,kind:'hongo',stain:'azul',feats:['murcielago','tos'],
+ epi:'Espeleólogo que volvió de una cueva con guano de murciélago. Fiebre y tos.',
+ sint:'Lo persigue una nube de murciélagos y lleva levaduritas escondidas en sus macrófagos.',
+ lab:'DIMÓRFICO. En tejido: levaduras chiquitas (2-4 µm) DENTRO de macrófagos. A 25 °C: macroconidias tuberculadas.',
+ atk:[['Parasitismo del macrófago','vive y viaja dentro de tus fagocitos.'],['Diseminación','hígado, bazo, médula, mucosa oral.'],['Granulomas','te deja calcificaciones.']],
+ best:{itra:'Itraconazol: elección en formas leves a moderadas.'},
+ ok:{anfo:'Anfotericina B: formas graves o diseminadas, después itraconazol.',fluco:'Fluconazol: menos eficaz, segunda línea.'},
+ ficha:{m:'Hongo dimórfico: levadura pequeña intracelular en tejido; micelio con macroconidias tuberculadas a 25 °C.',v:'Supervivencia en macrófagos, dimorfismo térmico.',c:'Pulmonar aguda (a menudo asintomática), crónica cavitaria en fumadores, diseminada en HIV.',t:'Itraconazol; anfotericina en formas graves.',x:'Fuente: guano de murciélagos y aves (gallineros, cuevas).'}},
+{id:'paraco',n:'Paracoccidioides brasiliensis',f:4,kind:'hongo',stain:'azul',feats:['moriforme','tabaco'],
+ epi:'Hombre rural del litoral argentino, tabaquista, con lesiones en la boca que sangran.',
+ sint:'Boca llena de lesiones granulares como mora sangrante. Fuma un armado.',
+ lab:'DIMÓRFICO. En tejido: levadura grande con múltiples brotes en RUEDA DE TIMÓN. Micelio a 25 °C.',
+ atk:[['gp43','glicoproteína de adhesión, inmunodominante.'],['Estomatitis moriforme','lesiones mucosas granulomatosas.'],['Fibrosis pulmonar','secuela crónica.']],
+ best:{itra:'Itraconazol: elección en formas leves y moderadas.'},
+ ok:{tmp:'TMP-SMX: alternativa clásica y barata, en tratamiento prolongado.',anfo:'Anfotericina B: formas graves.'},
+ ficha:{m:'Hongo dimórfico; levadura multibrotante en rueda de timón.',v:'gp43, dimorfismo (los estrógenos frenan la transición).',c:'Forma crónica del adulto: pulmonar + lesiones mucosas moriformes + adenopatías. Forma juvenil aguda.',t:'Itraconazol; TMP-SMX; anfotericina en formas graves.',x:'Endémica en el NEA; casi todos hombres por el efecto protector de los estrógenos.'}},
+{id:'pjiro',n:'Pneumocystis jirovecii',f:4,kind:'hongo',stain:'grocott',feats:['tos','vidrio'],
+ epi:'HIV con CD4 de 150, sin profilaxis: disnea progresiva, desatura al caminar.',
+ sint:'Respira como si se ahogara y tiene los pulmones de vidrio esmerilado.',
+ lab:'NO se cultiva. Quistes en BAL o esputo inducido con GROCOTT (plata) o inmunofluorescencia. LDH elevada.',
+ atk:[['Trofozoitos','se pegan a los neumocitos tipo I.'],['Alveolitis','llena tus alvéolos de exudado espumoso.'],['Hipoxemia','desaturás al esfuerzo.']],
+ best:{tmp:'TMP-SMX: elección para tratamiento y profilaxis (CD4 menor a 200).'},
+ res:{anfo:PJ,fluco:PJ,itra:PJ,vori:PJ},
+ nul:{equino:'La equinocandina solo afecta la forma quística: no es tratamiento.'},
+ ficha:{m:'Hongo atípico, no cultivable, sin ergosterol.',v:'Adhesión a neumocitos tipo I.',c:'Neumonía en HIV con CD4 menor a 200, trasplantados y corticoides crónicos: disnea, tos seca, vidrio esmerilado.',t:'TMP-SMX (+ corticoides si PaO2 menor a 70).',x:'La anfotericina no sirve: no tiene ergosterol.'}},
+{id:'dermato',n:'Trichophyton (dermatofito)',f:4,kind:'hongo',stain:'azul',feats:['anillo','gato'],
+ epi:'Chico que juega con un gato: lesión circular que pica y crece hacia afuera.',
+ sint:'Cubierto de anillos rojos con el centro más claro y el borde que avanza.',
+ lab:'KOH de escamas: hifas TABICADAS. Sabouraud con antibióticos.',
+ atk:[['Queratinasas','se come la queratina de piel, pelo y uñas.'],['Prurito','te rascás y lo desparramás.']],
+ best:{terbi:'Terbinafina: elección, se acumula en la queratina.'},
+ ok:{itra:'Itraconazol: alternativa (pulsos en onicomicosis).',fluco:'Fluconazol: alternativa.'},
+ res:{nista:'La nistatina no sirve para dermatofitos: solo para Candida.'},
+ ficha:{m:'Hongo filamentoso queratinofílico (Trichophyton, Microsporum, Epidermophyton).',v:'Queratinasas; no invade tejido vivo profundo.',c:'Tiñas: corporis (anillo), capitis, pedis, unguium (onicomicosis), cruris.',t:'Terbinafina o azoles, tópicos u orales; griseofulvina en tiña capitis.',x:'La tiña capitis necesita tratamiento oral: lo tópico no llega al folículo.'}},
+{id:'sporo',n:'Sporothrix schenckii',f:4,kind:'hongo',stain:'azul',feats:['nodulos','rosa'],
+ epi:'Jardinera que se pinchó con una espina de rosal hace 3 semanas.',
+ sint:'Una fila de nódulos ulcerados que suben por el brazo siguiendo el linfático. Lleva una rosa.',
+ lab:'DIMÓRFICO. En tejido: levaduras en CIGARRO (escasas) y cuerpos asteroides. Micelio con conidias en margarita.',
+ atk:[['Inoculación traumática','entra por la espina.'],['Diseminación linfática','nódulos en rosario.']],
+ best:{itra:'Itraconazol: elección en esporotricosis linfocutánea.'},
+ ok:{anfo:'Anfotericina: formas diseminadas.',terbi:'Terbinafina: alternativa.'},
+ ficha:{m:'Hongo dimórfico; levaduras en cigarro, cuerpos asteroides.',v:'Dimorfismo térmico, melanina.',c:'Esporotricosis linfocutánea (nódulos que ascienden por el linfático), fija, diseminada.',t:'Itraconazol; antes se usaba yoduro de potasio.',x:'Transmisión: espinas de rosal, musgo y arañazos de gato.'}},
+{id:'mucor',n:'Mucor / Rhizopus',f:4,boss:true,kind:'hongo',stain:'azul',feats:['escara','moho','boss'],mohoC:'#5a5f5c',
+ epi:'Diabético en cetoacidosis: dolor facial, secreción nasal oscura y una mancha negra en el paladar.',
+ sint:'Media cara podrida en negro e hifas gruesas que le salen por la nariz. Se alimenta de glucosa y hierro.',
+ lab:'Hifas ANCHAS, cintiformes, NO tabicadas (cenocíticas), ramificación en ÁNGULO RECTO (90°).',
+ atk:[['Angioinvasión','trombosa vasos: necrosis negra.'],['Captación de hierro','la acidosis le libera hierro.'],['Extensión rino-órbito-cerebral','de la nariz al cerebro.']],
+ best:{anfo:'Anfotericina B liposomal + desbridamiento quirúrgico + corregir la cetoacidosis.'},
+ res:{vori:'Mucorales: RESISTENCIA INTRÍNSECA a voriconazol.',fluco:'El fluconazol no cubre mucorales.',equino:'Las equinocandinas no tienen actividad útil en mucorales.'},
+ ficha:{m:'Mucorales: hifas anchas, no tabicadas, ramificadas a 90°.',v:'Angioinvasión, avidez por hierro, crecimiento rapidísimo.',c:'Mucormicosis rino-órbito-cerebral en diabéticos con cetoacidosis; pulmonar en neutropénicos.',t:'Cirugía + anfotericina B liposomal + corregir la enfermedad de base. Alternativa: posaconazol o isavuconazol.',x:'El voriconazol no sirve y hasta favorece su aparición.'}}
+];
+const EBY=Object.fromEntries(E.map(e=>[e.id,e]));
+const FLOORS={1:'Guardia · Gram +',2:'Terapia · Gram −',3:'Aislamiento · anaerobios y atípicos',4:'Micoteca · hongos',0:'Mezcla total'};
+const STAIN={pos:['Gram + (violeta)','#7c3aed'],neg:['Gram − (rosa)','#ec4899'],baar:['Ziehl-Neelsen: BAAR (rojo)','#dc2626'],azul:['Azul de lactofenol','#3b82f6'],tinta:['Tinta china: halo capsular','#cbd5e1'],grocott:['Grocott (plata)','#334155'],oscuro:['Campo oscuro: no se tiñe','#f1f5f9'],nada:['No se tiñe con Gram','#94a3b8']};
+
+/* ============ LÓGICA DE TIRO ============ */
+const gramOf=e=>e.g||(e.stain==='pos'?'+':e.stain==='neg'?'-':null);
+function generic(w,e){
+ const cls=w.cls||'ab',g=gramOf(e),f=e.flags||{};
+ if(e.kind==='hongo'&&cls==='ab') return 'Antibacteriano contra un hongo: es eucariota, sin peptidoglicano y con ribosoma 80S. No hay blanco.';
+ if(e.kind!=='hongo'&&cls==='af') return 'Antifúngico contra una bacteria: no tiene ergosterol ni pared de glucanos. No hay blanco.';
+ if(w.id==='antitox') return 'No hay una toxina para neutralizar con antitoxina en este bicho.';
+ if(w.id==='sosten') return 'Con sostén solo no alcanza: este necesita tratamiento específico.';
+ if(e.kind==='hongo') return w.n+' no es la opción indicada para este hongo.';
+ if(f.myco) return 'Pared llena de ácidos micólicos: casi impermeable. Las micobacterias necesitan un esquema combinado y largo.';
+ if((w.fam==='bl'||w.id==='vanco')&&f.sinPared) return 'No tiene pared de peptidoglicano: no hay nada que romper.';
+ if(w.fam==='bl'&&f.intracel) return 'Vive dentro de las células: el betalactámico casi no penetra y no lo alcanza.';
+ if(w.id==='vanco'&&g==='-') return 'La vancomicina es una molécula enorme: no atraviesa la membrana externa de los Gram −.';
+ if(w.id==='genta'&&f.anaerobio) return 'Los aminoglucósidos entran por un transporte que depende de O₂: en un anaerobio no entran.';
+ if(w.id==='metro'&&!f.anaerobio) return 'El metronidazol necesita reducirse en ambiente anaerobio para activarse: acá no se activa.';
+ if(w.id==='colis'&&g!=='-') return 'La colistina ataca el LPS de la membrana externa: este bicho no tiene.';
+ if(w.id==='nitro') return 'La nitrofurantoína solo concentra en orina: sirve para cistitis y nada más.';
+ if(w.id==='ripe') return 'El esquema RIPE es para micobacterias: acá es munición pesada al voleo.';
+ if((w.id==='oxa'||w.id==='cefa1'||w.id==='penG')&&g==='-') return w.n+' tiene espectro de Gram +: no atraviesa bien las porinas de este Gram −.';
+ return w.n+' no es una opción indicada para este bicho: le hace cosquillas.';
+}
+function evalShot(w,e){
+ if(e.best&&e.best[w.id]) return {t:'best',txt:e.best[w.id]};
+ if(e.ok&&e.ok[w.id]) return {t:'ok',txt:e.ok[w.id]};
+ if(e.res&&e.res[w.id]) return {t:'res',txt:e.res[w.id]};
+ if(e.nul&&e.nul[w.id]) return {t:'nul',txt:e.nul[w.id]};
+ if(e.allAb&&(w.cls||'ab')==='ab') return {t:'res',txt:e.allAb};
+ return {t:'nul',txt:generic(w,e)};
+}
+
+/* ============ ESTADO ============ */
+const $=id=>document.getElementById(id);
+const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(_){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(_){}}};
+let dex=store.get('gz-dex',{});
+const S={mode:null,floor:1,queue:[],room:0,rooms:0,hp:100,pressure:0,xp:0,ammo:{},enemy:null,busy:false,tab:'pared',log:[],kills:0,clean:0,misfires:0,cdiffNext:false,hurtT:-9,recoil:0,shots:[],floats:[],started:false};
+function resetAmmo(){W.forEach(w=>{if(w.ammo)S.ammo[w.id]=w.ammo})}
+const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+function buildFloor(f){
+ if(f===0){const pool=shuffle(E.filter(e=>!e.boss));const boss=shuffle(E.filter(e=>e.boss))[0];return pool.slice(0,6).map(e=>e.id).concat(boss.id)}
+ const pool=shuffle(E.filter(e=>e.f===f&&!e.boss));const boss=E.find(e=>e.f===f&&e.boss);
+ return pool.slice(0,6).map(e=>e.id).concat(boss.id);
+}
+function startRun(mode,floor){
+ S.mode=mode;S.floor=mode==='camp'?1:floor;S.hp=100;S.pressure=0;S.xp=0;S.kills=0;S.clean=0;S.misfires=0;S.cdiffNext=false;resetAmmo();
+ S.log=[];S.started=true;startFloor();closeOv();
+}
+function startFloor(){S.queue=buildFloor(S.floor);S.rooms=S.queue.length;S.room=0;resetAmmo();nextEnemy();}
+function nextEnemy(){
+ let id;
+ if(S.cdiffNext){id='cdiff';S.cdiffNext=false;S.rooms++}
+ else id=S.queue.shift();
+ if(!id){floorClear();return}
+ S.room++;
+ const d=EBY[id];
+ const hp=d.boss?150:100;
+ S.enemy={d,hp,max:hp,dist:3,disp:0.12,scanned:false,diag:false,mult:1,misses:0,hint:false,wrong:[],dying:-1,flash:-9,shield:-9,hitT:-9};
+ S.log=[];
+ say('<b>'+(d.boss?'¡JEFE DE PISO! ':'¡Un paciente se transformó! ')+'</b>'+d.epi);
+ say(d.sint);
+ S.busy=false;render();
+}
+function say(html){S.log.push(html);if(S.log.length>3)S.log.shift();renderLog()}
+function renderLog(){$('dlg').innerHTML=S.log.map((h,i)=>'<p'+(i<S.log.length-1&&S.log.length>2&&i===0?' class="old"':'')+'>'+h+'</p>').join('')}
+
+/* ============ ACCIONES ============ */
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+async function fire(w){
+ const e=S.enemy;if(S.busy||!e||e.dying>=0)return;
+ if(w.ammo&&S.ammo[w.id]<=0){say('<span class="bad">Sin '+w.n+' en la reserva de este piso.</span> Cada piso repone la farmacia.');return}
+ S.busy=true;render();
+ if(w.ammo)S.ammo[w.id]--;
+ S.recoil=1;S.shots.push({t0:performance.now(),col:TABC[w.tab]});
+ await wait(280);
+ const r=evalShot(w,e.d),d=e.d;let msg='';
+ if(r.t==='best'){const dmg=Math.round(55*e.mult);e.hp-=dmg;e.hitT=now();pop('-'+dmg,'#ffd166');msg='<b class="good">¡SÚPER EFECTIVO!</b> '+r.txt}
+ else if(r.t==='ok'){const dmg=Math.round(28*e.mult);e.hp-=dmg;e.hitT=now();pop('-'+dmg,'#e8e3d6');msg='<b>Le pega.</b> Sirve, pero no es la primera elección. '+r.txt}
+ else if(r.t==='res'){e.hp=Math.min(e.max,e.hp+12);e.shield=now();e.misses++;S.misfires++;pop('RESISTE','#ff5148');msg='<b class="bad">¡RESISTE!</b> '+r.txt;
+   if(d.abHurt&&(w.cls||'ab')==='ab'){S.hp-=d.abHurt;S.hurtT=now();msg+=' <span class="bad">(−'+d.abHurt+' de salud)</span>'}}
+ else {e.misses++;S.misfires++;pop('SIN EFECTO','#8f9c99');msg='<b>Sin efecto.</b> '+r.txt}
+ if(w.press&&r.t!=='best'){S.pressure+=w.press;msg+=' <span class="bad">Presión de selección +'+w.press+'%.</span>'}
+ say(msg);
+ if(S.pressure>=100&&!S.cdiffNext&&d.id!=='cdiff'){S.pressure=0;S.cdiffNext=true;say('<b class="bad">Presión de selección al máximo:</b> arrasaste la flora intestinal. Algo se mueve en el colon...')}
+ if(e.misses>=2&&!e.hint)giveHint(true);
+ render();
+ if(S.hp<=0){await wait(600);return gameOver()}
+ if(e.hp<=0){await wait(400);return kill()}
+ await wait(650);await enemyTurn();
+}
+async function scan(){
+ const e=S.enemy;if(S.busy||!e||e.dying>=0)return;
+ if(e.scanned){say('<b>Escáner:</b> '+e.d.lab);return}
+ S.busy=true;e.scanned=true;render();
+ say('<b>Escáner · '+STAIN[e.d.stain][0]+':</b> '+e.d.lab);
+ await wait(700);await enemyTurn();
+}
+function diagnose(){
+ const e=S.enemy;if(S.busy||!e||e.dying>=0||e.diag)return;
+ const same=E.filter(x=>x.id!==e.d.id&&(x.kind||'bac')===(e.d.kind||'bac')&&!e.wrong.includes(x.id));
+ const opts=shuffle([e.d,...shuffle(same).slice(0,3)]);
+ openOv('<h3>Diagnosticar</h3><h2>¿Qué bicho es?</h2><p class="lead">Si acertás, tus disparos pegan 40% más fuerte y queda registrado en el bestiario. Si errás, te come un turno.</p><div class="dgrid">'+
+  opts.map(o=>'<button class="btn" data-dx="'+o.id+'"><span class="t">'+o.n+'</span></button>').join('')+'</div><button class="btn" data-close><span class="t">Volver</span><span class="s">sin gastar turno</span></button>');
+ $('ovbox').querySelectorAll('[data-dx]').forEach(b=>b.onclick=()=>pickDx(b.dataset.dx));
+}
+async function pickDx(id){
+ closeOv();const e=S.enemy;S.busy=true;
+ if(id===e.d.id){e.diag=true;e.mult=1.4;say('<b class="good">Diagnóstico confirmado:</b> '+e.d.n+'. Tus disparos ahora pegan 40% más fuerte.');S.xp+=30}
+ else{e.wrong.push(id);say('<b class="bad">Diagnóstico errado:</b> no es '+EBY[id].n+'. Revisá las pistas.')}
+ render();await wait(700);await enemyTurn();
+}
+function giveHint(auto){
+ const e=S.enemy;if(!e||e.hint)return;e.hint=true;
+ const bid=Object.keys(e.d.best)[0],w=WBY[bid],tab=TABS.find(t=>t.id===w.tab);
+ say('<b>Residente:</b> '+(auto?'«Pará de tirar al voleo. ':'«')+'Fijate en la pestaña <b>'+tab.n+'</b>.»');
+ render();
+}
+async function enemyTurn(){
+ const e=S.enemy;if(!e||e.hp<=0){S.busy=false;render();return}
+ e.dist=Math.max(0,e.dist-1);
+ if(e.dist<=1){
+  const a=e.d.atk[Math.floor(Math.random()*e.d.atk.length)];
+  let dmg=(e.d.boss?10:6)+Math.floor(Math.random()*5);if(e.dist===0)dmg=Math.round(dmg*1.3);
+  S.hp-=dmg;S.hurtT=now();
+  say('<span class="bad">Te ataca con <b>'+a[0]+'</b>: '+a[1]+' −'+dmg+'</span>');
+ } else say('Avanza arrastrando los pies. Está a '+(e.dist*3)+' metros.');
+ render();
+ if(S.hp<=0){await wait(500);return gameOver()}
+ S.busy=false;render();
+}
+async function kill(){
+ const e=S.enemy;e.dying=now();S.busy=true;render();
+ let gain=e.d.boss?300:100;if(e.diag)gain+=50;const clean=e.misses===0;if(clean){gain+=50;S.clean++}
+ S.xp+=gain;S.kills++;
+ const rec=dex[e.d.id]||{k:0,dx:false};rec.k++;if(e.diag)rec.dx=true;dex[e.d.id]=rec;store.set('gz-dex',dex);
+ await wait(1100);
+ const heal=Math.min(15,100-S.hp);S.hp+=heal;
+ showFicha(e.d,{gain,clean,heal,after:true});
+}
+function floorClear(){
+ S.busy=true;const heal=Math.min(40,100-S.hp);S.hp+=heal;S.enemy=null;render();
+ const last=S.mode!=='camp'||S.floor===4;
+ const best=store.get('gz-best',0);if(last&&S.xp>best)store.set('gz-best',S.xp);
+ if(S.mode==='mix'){S.queue=buildFloor(0);S.rooms=S.queue.length;S.room=0;resetAmmo();
+  openOv('<h3>Ronda despejada</h3><h2>Seguís de guardia</h2><div class="statline"><span>XP <b>'+S.xp+'</b></span><span>Bajas <b>'+S.kills+'</b></span><span>Salud <b>+'+heal+'</b></span></div><p class="lead">Se repone la reserva hospitalaria. Viene otra tanda mezclada.</p><button class="btn main" id="goOn"><span class="t">Seguir</span><span class="s">nueva ronda</span></button>');
+  $('goOn').onclick=()=>{closeOv();nextEnemy()};return}
+ if(!last){
+  openOv('<h3>Piso '+S.floor+' despejado</h3><h2>'+FLOORS[S.floor]+': limpio</h2><div class="statline"><span>XP <b>'+S.xp+'</b></span><span>Tiros limpios <b>'+S.clean+'</b></span><span>Salud <b>+'+heal+'</b></span></div><p class="lead">Subís al piso '+(S.floor+1)+': '+FLOORS[S.floor+1]+'. La farmacia repone la reserva.</p><button class="btn main" id="goOn"><span class="t">Subir</span><span class="s">'+FLOORS[S.floor+1]+'</span></button>');
+  $('goOn').onclick=()=>{closeOv();S.floor++;startFloor()};return}
+ openOv('<h3>Turno terminado</h3><h2>'+(S.mode==='camp'?'Sobreviviste a la guardia completa':'Piso despejado')+'</h2><div class="statline"><span>XP <b>'+S.xp+'</b></span><span>Bajas <b>'+S.kills+'</b></span><span>Tiros limpios <b>'+S.clean+'</b></span><span>Disparos errados <b>'+S.misfires+'</b></span></div><p class="lead">Récord: '+Math.max(best,S.xp)+' XP. Mirá el bestiario para repasar las fichas que juntaste.</p><button class="btn main" id="goMenu"><span class="t">Volver al menú</span></button>');
+ $('goMenu').onclick=menu;
+}
+function gameOver(){
+ S.busy=true;const best=store.get('gz-best',0);if(S.xp>best)store.set('gz-best',S.xp);
+ const d=S.enemy&&S.enemy.d;
+ openOv('<h3>Te alcanzaron</h3><h2>Fin del turno</h2><div class="statline"><span>XP <b>'+S.xp+'</b></span><span>Bajas <b>'+S.kills+'</b></span><span>Disparos errados <b>'+S.misfires+'</b></span></div>'+
+ (d?'<p class="lead">Te venció <b style="color:var(--fg)">'+d.n+'</b>. Lo que lo frenaba: <b style="color:var(--accent)">'+Object.keys(d.best).map(k=>WBY[k].n).join(' o ')+'</b>.</p><button class="btn" id="seeF"><span class="t">Ver su ficha</span></button>':'')+
+ '<button class="btn main" id="retry"><span class="t">Reintentar</span><span class="s">mismo modo</span></button><button class="btn" id="goMenu"><span class="t">Menú</span></button>');
+ $('retry').onclick=()=>startRun(S.mode,S.floor);$('goMenu').onclick=menu;
+ if(d)$('seeF').onclick=()=>showFicha(d,{back:gameOver});
+}
+
+/* ============ OVERLAYS ============ */
+function openOv(html){$('ovbox').innerHTML=html;$('ov').hidden=false;const c=$('ovbox').querySelector('[data-close]');if(c)c.onclick=closeOv;const f=$('ovbox').querySelector('button');if(f)f.focus()}
+function closeOv(){$('ov').hidden=true}
+function showFicha(d,o){
+ o=o||{};const st=STAIN[d.stain];const fi=d.ficha;
+ const bests=Object.keys(d.best).map(k=>WBY[k].n).join(' · ');
+ openOv((o.after?'<h3>Registrado en el bestiario'+(o.clean?' · tiro limpio':'')+'</h3>':'<h3>Ficha · Piso '+d.f+'</h3>')+
+ '<h2>'+d.n+'</h2><div class="stainrow"><span class="dot" style="background:'+st[1]+'"></span>'+st[0]+(d.boss?' · <b style="color:var(--danger)">Jefe</b>':'')+'</div>'+
+ '<div class="ficha"><dl><div><dt>Morfología</dt><dd>'+fi.m+'</dd></div><div><dt>Factores de virulencia</dt><dd>'+fi.v+'</dd></div><div><dt>Cuadro</dt><dd>'+fi.c+'</dd></div><div><dt>Tratamiento</dt><dd>'+fi.t+'<br><span style="color:var(--mute);font-size:13px">En el juego: '+bests+'</span></dd></div><div class="trap"><dt>Trampa de examen</dt><dd>'+fi.x+'</dd></div></dl></div>'+
+ (o.after?'<div class="statline"><span>XP <b>+'+o.gain+'</b></span>'+(o.heal?'<span>Salud <b>+'+o.heal+'</b></span>':'')+'</div><button class="btn main" id="goOn"><span class="t">Siguiente sala</span><span class="s">Enter</span></button>':
+  '<button class="btn" id="goBack"><span class="t">Volver</span></button>'));
+ if(o.after)$('goOn').onclick=()=>{closeOv();nextEnemy()};
+ else $('goBack').onclick=o.back||(()=>bestiario());
+}
+function bestiario(){
+ const back=S.started&&S.enemy?closeOv:menu;
+ const seen=E.filter(e=>dex[e.id]).length;
+ let html='<h3>Bestiario · '+seen+' de '+E.length+'</h3><h2>Tu colección de patógenos</h2><p class="lead">Cada bicho que bajás queda con su ficha. La estrella marca los que diagnosticaste vos.</p>';
+ [1,2,3,4].forEach(f=>{html+='<h3>Piso '+f+' · '+FLOORS[f]+'</h3><div class="bgrid">'+E.filter(e=>e.f===f).map(e=>{const r=dex[e.id];
+  return r?'<button class="bcard" data-f="'+e.id+'"><span class="bn">'+(r.dx?'★ ':'')+e.n+'</span><span class="bs">'+STAIN[e.stain][0]+' · ×'+r.k+'</span></button>':'<div class="bcard unseen"><span class="bn">???</span><span class="bs">'+(e.boss?'Jefe':'Sin encontrar')+'</span></div>'}).join('')+'</div>'});
+ html+='<button class="btn" id="bk"><span class="t">Volver</span></button>';
+ openOv(html);$('bk').onclick=back;
+ $('ovbox').querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>showFicha(EBY[b.dataset.f],{back:bestiario}));
+}
+function menu(){
+ S.enemy=null;S.started=false;S.busy=true;render();
+ const best=store.get('gz-best',0),seen=E.filter(e=>dex[e.id]).length;
+ openOv('<div class="logo">GUARDIA<span> Z</span></div><p class="lead">Turno noche. Los pacientes se transformaron en sus bacterias y hongos, con los síntomas llevados al extremo. Tu arsenal son los antibióticos, ordenados por dónde pegan.</p>'+
+ '<ul class="how"><li><b>Escanear</b> muestra la tinción y el laboratorio: el zombie se tiñe del color real.</li><li><b>Diagnosticar</b> bien suma 40% de daño.</li><li>El arma de <b>elección</b> pega fuerte, una que sirve pega poco, y si es resistente <b>se cura</b>.</li><li>Abusar de los de amplio espectro sube la <b>presión de selección</b>. Al 100%, aparece C. difficile.</li><li>Carbapenémicos, vancomicina y colistina tienen <b>reserva limitada</b> por piso.</li></ul>'+
+ '<div class="btns"><button class="btn main" data-m="camp"><span class="t">Campaña completa</span><span class="s">4 pisos · 28 salas</span></button>'+
+ '<div class="row2">'+[1,2,3,4].map(f=>'<button class="btn" data-m="floor" data-f="'+f+'"><span class="t">Piso '+f+'</span><span class="s">'+FLOORS[f]+'</span></button>').join('')+'</div>'+
+ '<button class="btn" data-m="mix"><span class="t">Mezcla total</span><span class="s">sin fin, todo mezclado</span></button>'+
+ '<button class="btn" id="mBest"><span class="t">Bestiario</span><span class="s">'+seen+' / '+E.length+(best?' · récord '+best+' XP':'')+'</span></button></div>');
+ $('ovbox').querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>startRun(b.dataset.m,+(b.dataset.f||0)));
+ $('mBest').onclick=bestiario;
+}
+
+/* ============ UI ============ */
+function renderTabs(){
+ $('tabs').innerHTML=TABS.map(t=>'<button class="tab" role="tab" aria-selected="'+(S.tab===t.id)+'" style="--tc:'+t.c+'" data-t="'+t.id+'"><i class="sq" style="background:'+t.c+'"></i>'+t.n+'</button>').join('');
+ $('tabs').querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{S.tab=b.dataset.t;renderTabs();renderWeapons()});
+}
+function renderWeapons(){
+ const ws=W.filter(w=>w.tab===S.tab),dis=S.busy||!S.enemy||S.enemy.dying>=0;
+ $('wgrid').innerHTML=ws.map((w,i)=>'<button class="wpn" style="--tc:'+TABC[w.tab]+'" data-w="'+w.id+'"'+(dis?' disabled':'')+'><i class="ic"></i><span class="nm">'+w.n+'</span><span class="'+(w.ammo?'am':'key')+'">'+(w.ammo?'×'+S.ammo[w.id]:i+1)+'</span><span class="mc">'+w.mech+'</span></button>').join('');
+ $('wgrid').querySelectorAll('[data-w]').forEach(b=>b.onclick=()=>fire(WBY[b.dataset.w]));
+}
+function render(){
+ const e=S.enemy;
+ $('floorLbl').textContent=S.started?(S.mode==='mix'?FLOORS[0]:'Piso '+S.floor+' · '+FLOORS[S.floor]):'Guardia Z';
+ $('roomLbl').textContent=S.started&&e?'Sala '+S.room+'/'+S.rooms:'';
+ $('xpLbl').textContent='XP '+S.xp;
+ const hp=Math.max(0,S.hp);$('hpVal').textContent=hp;$('hpbar').firstElementChild.style.width=hp+'%';
+ $('hpbar').firstElementChild.style.background=hp<30?'var(--danger)':'var(--ok)';
+ const pr=Math.min(100,S.pressure);$('prVal').textContent=pr+'%';$('prbar').firstElementChild.style.width=pr+'%';
+ $('ammoVal').innerHTML=W.filter(w=>w.ammo).map(w=>w.n.split(' ')[0]+' <b style="color:var(--accent)">'+(S.ammo[w.id]??w.ammo)+'</b>').join(' · ');
+ const pl=$('plate');pl.hidden=!e;
+ if(e){
+  const known=e.diag||e.dying>=0;$('pname').textContent=known?e.d.n:(e.d.boss?'??? · JEFE':'???');$('pname').className='pname'+(known?'':' unk');
+  $('ehp').style.width=Math.max(0,e.hp/e.max*100)+'%';
+  let tags='<span class="chip">'+(e.dist===0?'¡Encima tuyo!':'A '+e.dist*3+' m')+'</span>';
+  if(e.scanned)tags+='<span class="chip" style="border-color:'+STAIN[e.d.stain][1]+'">'+STAIN[e.d.stain][0]+'</span>';
+  if(e.diag)tags+='<span class="chip" style="color:var(--ok)">Dx ×1,4</span>';
+  $('ptags').innerHTML=tags;
+ }
+ const dis=S.busy||!e||e.dying>=0;
+ $('bScan').disabled=dis;$('bDiag').disabled=dis||(e&&e.diag);$('bHint').disabled=!e||e.hint||e.dying>=0;
+ renderWeapons();
+}
+$('bScan').onclick=scan;$('bDiag').onclick=diagnose;$('bHint').onclick=()=>giveHint(false);$('bBest').onclick=bestiario;
+document.addEventListener('keydown',ev=>{
+ if(!$('ov').hidden){if(ev.key==='Enter'){const m=$('ovbox').querySelector('#goOn');if(m){ev.preventDefault();m.click()}}if(ev.key==='Escape'&&$('ovbox').querySelector('[data-close]'))closeOv();return}
+ const k=ev.key.toLowerCase();
+ if(k==='s')scan();else if(k==='d')diagnose();else if(k==='p')giveHint(false);else if(k==='b')bestiario();
+ else if(k==='arrowright'||k==='arrowleft'){const i=TABS.findIndex(t=>t.id===S.tab);S.tab=TABS[(i+(k==='arrowright'?1:TABS.length-1))%TABS.length].id;renderTabs();renderWeapons()}
+ else if(/^[1-9]$/.test(k)){const ws=W.filter(w=>w.tab===S.tab);const w=ws[+k-1];if(w)fire(w)}
+});
+
+/* ============ RENDER CANVAS ============ */
+const cv=$('cv'),c=cv.getContext('2d');
+const now=()=>performance.now();
+function pop(txt,col){S.floats.push({txt,col,t0:now()})}
+function poly(pts,col){c.fillStyle=col;c.beginPath();c.moveTo(pts[0],pts[1]);for(let i=2;i<pts.length;i+=2)c.lineTo(pts[i],pts[i+1]);c.closePath();c.fill()}
+function circ(x,y,r,col){c.fillStyle=col;c.beginPath();c.arc(x,y,r,0,7);c.fill()}
+function rnd(seed){let s=0;for(const ch of seed)s=(s*31+ch.charCodeAt(0))%2147483647;s=s||7;return()=>(s=s*16807%2147483647)/2147483647}
+const HZ=78;
+function drawCorridor(t){
+ poly([0,0,320,0,200,56,120,56],'#16201f');
+ poly([0,180,320,180,200,100,120,100],'#2a2e29');
+ poly([0,0,120,56,120,100,0,180],'#283a3c');
+ poly([320,0,200,56,200,100,320,180],'#253638');
+ c.fillStyle='#1d2b2e';c.fillRect(120,56,80,44);
+ // puerta del fondo
+ c.fillStyle='#0f1719';c.fillRect(146,66,28,34);c.fillStyle='#2d4a4f';c.fillRect(159,66,2,34);
+ c.fillStyle=Math.sin(t/300)>0?'#ff3b30':'#5a1410';c.fillRect(154,60,12,4);
+ // baldosas
+ c.strokeStyle='rgba(0,0,0,.35)';c.lineWidth=1;
+ for(let i=1;i<9;i++){const f=Math.pow(i/9,1.7),y=100+80*f;c.beginPath();c.moveTo(120-120*f,y);c.lineTo(200+120*f,y);c.stroke()}
+ for(let x=-6;x<=6;x++){c.beginPath();c.moveTo(160+x*6.6,100);c.lineTo(160+x*48,180);c.stroke()}
+ // zócalo y paneles
+ c.fillStyle='#1a2627';poly([0,150,120,94,120,100,0,180],'#1a2627');poly([320,150,200,94,200,100,320,180],'#182324');
+ c.strokeStyle='rgba(0,0,0,.28)';
+ [0.15,0.42,0.68].forEach(f=>{const x=120*f;c.beginPath();c.moveTo(x,56*f);c.lineTo(x,180-80*f);c.stroke();c.beginPath();c.moveTo(320-x,56*f);c.lineTo(320-x,180-80*f);c.stroke()});
+ // puertas laterales
+ poly([40,62,74,78,74,128,40,147],'#162224');poly([280,62,246,78,246,128,280,147],'#152022');
+ c.fillStyle='#ffb02e';c.fillRect(52,82,8,3);
+ // manchas
+ c.fillStyle='rgba(70,10,10,.45)';c.fillRect(88,104,5,9);c.fillRect(91,110,3,8);c.fillRect(232,118,7,4);
+ // tubos de luz
+ [[0.18,1],[0.45,0],[0.72,1]].forEach(([f,fl])=>{const y=4+50*f,hw=(1-f)*36+8,hh=1+3*(1-f);
+  let a=0.9;if(fl){const n=Math.sin(t/37)*Math.sin(t/91);a=n>0.6?0.15:0.85}
+  c.fillStyle='rgba(205,240,214,'+a+')';c.fillRect(160-hw,y,hw*2,hh);
+  c.fillStyle='rgba(180,240,200,'+(a*0.06)+')';c.beginPath();c.moveTo(160-hw,y+hh);c.lineTo(160+hw,y+hh);c.lineTo(160+hw*2.2,y+60);c.lineTo(160-hw*2.2,y+60);c.fill()});
+}
+function skinOf(e){
+ const d=e.d,F=d.feats;
+ if(e.scanned){const sc=STAIN[d.stain][1];if(d.stain==='tinta')return '#4b5563';return sc}
+ if(F.includes('ictericia'))return '#c9b64d';
+ if(d.kind==='hongo')return '#9aa69a';
+ return '#9fae86';
+}
+function drawZombie(e,x,fy,k,t){
+ const d=e.d,F=new Set(d.feats),walk=e.dying<0;
+ const ph=t/1000*(walk?5:0),bob=Math.sin(ph)*1.4,sw=Math.sin(ph)*3.5;
+ let skin=skinOf(e);
+ const hit=now()-e.hitT<160;
+ c.save();c.translate(x,fy);c.scale(k,k);
+ // charcos
+ const puddle=(col,w)=>{c.fillStyle=col;c.beginPath();c.ellipse(0,1,w,4,0,0,7);c.fill()};
+ if(F.has('grosella'))puddle('#4a0d10',26);
+ if(F.has('sangre'))puddle('#6e1414',30);
+ if(F.has('diarrea'))puddle('#5d5a22',30);
+ if(F.has('aguaarroz')){puddle('#c9cdbf',34);c.fillStyle='#f4f4ea';for(let i=0;i<10;i++)c.fillRect(-28+i*6,-1+(i%2)*2,2,1)}
+ if(F.has('secrecion'))puddle('#c9a227',14);
+ if(F.has('moco')){c.fillStyle='#d8d6c0';c.fillRect(-14,-1,10,2);c.fillRect(6,1,8,2)}
+ // auras
+ if(F.has('boss')){const p=0.5+0.5*Math.sin(t/240);c.fillStyle='rgba(255,40,40,'+(0.10+0.08*p)+')';c.beginPath();c.ellipse(0,-58,48+p*4,72,0,0,7);c.fill()}
+ if(F.has('verde')){const p=0.5+0.5*Math.sin(t/300);c.fillStyle='rgba(60,230,120,'+(0.14+0.1*p)+')';c.beginPath();c.ellipse(0,-58,42,68,0,0,7);c.fill()}
+ if(d.stain==='oscuro'&&e.scanned){c.fillStyle='rgba(255,255,255,.18)';c.beginPath();c.ellipse(0,-56,38,66,0,0,7);c.fill()}
+ c.save();
+ if(F.has('opistotonos'))c.rotate(-0.14);
+ c.translate(0,bob);
+ // piernas
+ c.fillStyle='#3a4741';c.fillRect(-11,-44+Math.max(0,sw),8,44-Math.max(0,sw));c.fillRect(3,-44+Math.max(0,-sw),8,44-Math.max(0,-sw));
+ c.fillStyle=skin;c.fillRect(-11,-8,8,6);c.fillRect(3,-8,8,6);
+ c.fillStyle='#222';c.fillRect(-12,-3,10,3);c.fillRect(2,-3,10,3);
+ // torso (camisolín)
+ const tw=F.has('flaco')?10:16;
+ c.fillStyle='#4f6b72';c.fillRect(-tw,-82,tw*2,40);
+ c.fillStyle='#3e575d';for(let i=-tw;i<tw;i+=6)c.fillRect(i,-44,3,4);
+ c.fillStyle='rgba(255,255,255,.12)';c.fillRect(-tw+3,-80,2,34);
+ if(F.has('vaca')){c.fillStyle='#e9e5da';c.fillRect(-tw,-82,tw*2,40);c.fillStyle='#1e1e1e';c.fillRect(-10,-76,9,8);c.fillRect(4,-62,8,10);c.fillRect(-12,-56,6,6)}
+ if(F.has('flaco')){c.strokeStyle=skin;c.lineWidth=1.5;for(let i=0;i<4;i++){c.beginPath();c.moveTo(-8,-78+i*5);c.lineTo(8,-78+i*5);c.stroke()}}
+ // brazos
+ const par=F.has('paralisis');
+ const hands=par?[[-19,-44],[19,-44]]:[[-32,-70-sw],[32,-70+sw]];
+ c.strokeStyle=skin;c.lineWidth=6;c.lineCap='round';
+ hands.forEach(([hx,hy],i)=>{c.beginPath();c.moveTo(i?tw-1:-tw+1,-78);c.lineTo(hx,hy);c.stroke()});
+ hands.forEach(([hx,hy])=>circ(hx,hy,3.6,skin));
+ // cuello y cabeza
+ if(F.has('cuellotoro')){c.fillStyle=skin;c.fillRect(-12,-92,24,13)}else{c.fillStyle=skin;c.fillRect(-4,-87,8,7)}
+ const hy=F.has('opistotonos')?-97:-94;
+ circ(0,hy,12,skin);
+ c.fillStyle='rgba(0,0,0,.15)';c.beginPath();c.arc(0,hy,12,0.2,2.9);c.fill();
+ // ojos
+ let eye=hit?'#fff':(F.has('ojosrojos')?'#ff2a2a':F.has('ictericia')?'#e6d23a':'#f6e05e');
+ if(F.has('deshidratado')){c.fillStyle='#2a2a2a';c.fillRect(-8,hy-5,6,5);c.fillRect(2,hy-5,6,5)}
+ c.fillStyle=eye;
+ if(par){c.fillRect(-7,hy-1,4,1);c.fillRect(3,hy-1,4,1)}else{c.fillRect(-7,hy-3,4,3);c.fillRect(3,hy-3,4,3)}
+ // boca
+ if(F.has('risa')){c.fillStyle='#1a0d0d';c.fillRect(-8,hy+4,16,4);c.fillStyle='#f2efe2';for(let i=-7;i<7;i+=3)c.fillRect(i,hy+4,2,3);c.strokeStyle='#2a1a1a';c.lineWidth=1;c.beginPath();c.moveTo(-9,hy+3);c.lineTo(-11,hy);c.moveTo(9,hy+3);c.lineTo(11,hy);c.stroke()}
+ else if(F.has('moriforme')){c.fillStyle='#8a1020';c.fillRect(-7,hy+3,14,6);c.fillStyle='#d0384a';for(let i=0;i<6;i++)c.fillRect(-6+i*2.2,hy+4+(i%2)*2,1.6,1.6)}
+ else if(F.has('muguet')){c.fillStyle='#3a1414';c.fillRect(-6,hy+4,12,5);c.fillStyle='#f5f2e8';c.fillRect(-5,hy+5,3,2);c.fillRect(1,hy+6,3,2);c.fillRect(-1,hy+4,2,1);c.fillRect(-12,hy+1,3,2);c.fillRect(8,hy+3,3,2)}
+ else if(F.has('lengua')){c.fillStyle='#1a0d0d';c.fillRect(-5,hy+4,10,3);c.fillStyle='#e11d48';c.fillRect(-3,hy+6,6,6);c.fillStyle='#ffd1dc';c.fillRect(-2,hy+8,1,1);c.fillRect(1,hy+10,1,1)}
+ else{c.fillStyle='#1a1212';c.fillRect(-5,hy+4,10,par?4:3)}
+ // rasgos
+ const r=rnd(d.id);
+ if(F.has('racimos')){[[-8,-70],[9,-58],[-4,-52],[10,-76],[-11,-60]].forEach(([px,py])=>{for(let j=0;j<4;j++)circ(px+(j%2)*3-1,py+(j>>1)*3-1,1.9,'#e8c547');c.fillStyle='rgba(120,80,0,.5)';c.fillRect(px,py,1,1)})}
+ if(F.has('forunculo')){[[-13,-64],[11,-86],[6,-48]].forEach(([px,py])=>{circ(px,py,3,'#b42318');circ(px,py,1.4,'#fde68a')})}
+ if(F.has('escaldada')){c.fillStyle='#f4b4b4';[[-26,-72],[20,-60],[-6,-100],[-14,-48]].forEach(([px,py])=>{c.beginPath();c.moveTo(px,py);c.lineTo(px+5,py+1);c.lineTo(px+2,py+5);c.fill()})}
+ if(F.has('cadena')){hands.forEach(([hx,hy2])=>{for(let j=1;j<6;j++){c.strokeStyle='#cfc6f5';c.lineWidth=1.2;c.beginPath();c.arc(hx+Math.sin(t/200+j)*0.8,hy2+j*4.5,1.8,0,7);c.stroke()}})}
+ if(F.has('capsula')){const p=Math.sin(t/260);c.strokeStyle='rgba(190,240,255,.55)';c.lineWidth=2;c.fillStyle='rgba(190,240,255,.08)';c.beginPath();c.ellipse(0,-56,36+p*1.5,64+p*1.5,0,0,7);c.fill();c.stroke()}
+ if(F.has('grosella')||F.has('herrumbre')){const col=F.has('grosella')?'#7a1015':'#a0521d';c.fillStyle=col;for(let j=0;j<3;j++){const L=((t/10+j*13)%30);c.fillRect(-3+j*2,hy+7,2,4+L*0.6)}if(F.has('grosella')){c.fillStyle='rgba(200,40,40,.6)';c.fillRect(-1,hy+8,1,6)}}
+ if(F.has('tos')||F.has('tosangre')){const col=F.has('tosangre')?'200,30,30':'170,190,160';for(let j=0;j<5;j++){const L=((t/6+j*24)%60)/60;c.fillStyle='rgba('+col+','+(0.7-L*0.6)+')';c.beginPath();c.arc((j%2?1:-1)*(2+L*12),hy+6+L*18,1.2+L*3,0,7);c.fill()}}
+ if(F.has('petequias')){c.fillStyle='#6b1a74';for(let j=0;j<28;j++){const px=(r()-0.5)*30,py=-100+r()*60;c.fillRect(px,py,1.6,1.6)}}
+ if(F.has('secrecion')){c.fillStyle='#e0b42a';const L=(t/12)%24;c.fillRect(-1.5,-42,3,6+L*0.4);circ(0,-30+L*1.1,1.8,'#e0b42a')}
+ if(F.has('secrecionclara')){const L=(t/15)%26;circ(0,-40+L,1.4,'rgba(200,230,255,.8)')}
+ if(F.has('fuego')){for(let j=0;j<3;j++){const h=7+Math.sin(t/90+j*2)*3;c.fillStyle=j===1?'#ffd166':'#ff6b2c';c.beginPath();c.moveTo(-7+j*5,-42);c.lineTo(-4.5+j*5,-42-h);c.lineTo(-2+j*5,-42);c.fill()}}
+ if(F.has('fimbrias')){c.strokeStyle='rgba(240,230,180,.75)';c.lineWidth=0.8;for(let j=0;j<20;j++){const a=j/20*Math.PI*2,rx=Math.cos(a)*20,ry=-62+Math.sin(a)*32;c.beginPath();c.moveTo(rx,ry);c.lineTo(rx*1.22,ry+(ry+62)*0.22);c.stroke()}}
+ if(F.has('bomba')){circ(0,-66,6,'#1c1c1c');c.fillStyle='#ff4d4d';c.fillRect(-1,-74,2,3);if(Math.sin(t/120)>0)circ(0,-75,1.5,'#ffd166')}
+ if(F.has('deshidratado')){c.strokeStyle='rgba(60,50,30,.5)';c.lineWidth=0.8;for(let j=0;j<4;j++){c.beginPath();c.moveTo(-9,hy+2+j*1.5-6);c.lineTo(-5,hy+2+j*1.5-6);c.stroke()}}
+ if(F.has('quemadura')){c.fillStyle='#2b1810';[[-12,-70,8,6],[6,-56,9,5],[-28,-70,5,4]].forEach(a=>c.fillRect(...a));c.fillStyle='#7a2e14';c.fillRect(-10,-68,3,2)}
+ if(F.has('babeo')){c.fillStyle='rgba(180,220,255,.8)';const L=(t/9)%28;c.fillRect(-1,hy+7,2,4+L*0.7)}
+ if(F.has('roseola')){c.fillStyle='#f08ca8';[[-6,-60],[5,-56],[-2,-52],[8,-64],[-9,-54]].forEach(([px,py])=>c.fillRect(px,py,2.2,2.2))}
+ if(F.has('fiebre')){c.strokeStyle='rgba(255,160,60,.7)';c.lineWidth=1;for(let j=-1;j<=1;j++){c.beginPath();for(let s=0;s<10;s++){const yy=hy-14-s*1.4;c.lineTo(j*6+Math.sin(t/120+s)*1.5,yy)}c.stroke()}}
+ if(F.has('ulcera')){const p=0.5+0.5*Math.sin(t/200);circ(0,-62,5,'rgba(255,60,40,'+(0.5+0.4*p)+')');circ(0,-62,2.5,'#3a0a0a')}
+ if(F.has('espiral')){c.strokeStyle='#e6d6a8';c.lineWidth=1.2;c.beginPath();for(let s=0;s<20;s++){c.lineTo(hands[1][0]+6+s*0.7,hands[1][1]-6+Math.sin(s*1.2+t/80)*2.5)}c.stroke()}
+ if(F.has('confuso')){c.fillStyle='#ffd166';c.font='bold 8px "Pixelify Sans",monospace';c.fillText('?',-12+Math.sin(t/300)*2,hy-14);c.fillText('?',8,hy-18+Math.cos(t/300)*2)}
+ if(F.has('goteo')){for(let j=0;j<3;j++){const L=((t/7+j*20)%40);circ(-14+j*14,hy-20+L,1.2,'rgba(140,200,255,.8)')}}
+ if(F.has('sudor')){for(let j=0;j<4;j++){const L=((t/8+j*15)%30);circ(-10+j*7,hy-4+L*0.8,1.3,'rgba(150,200,255,.85)')}}
+ if(F.has('crepitacion')){c.strokeStyle='rgba(230,240,230,.8)';c.lineWidth=0.8;for(let j=0;j<6;j++){const L=((t/20+j*10)%20);c.beginPath();c.arc(-8+(j%3)*5,-10-j*4-L*0.5,1.5,0,7);c.stroke()}}
+ if(F.has('necrosis')){c.fillStyle='#141414';c.fillRect(-11,-30,8,18);c.fillStyle='#3d2a1d';c.fillRect(-10,-26,3,5)}
+ if(F.has('pseudoabd')||F.has('pseudomembrana')){c.fillStyle='#b8b8a8';if(F.has('pseudoabd')){[[-10,-62,7,5],[2,-56,8,5],[-6,-50,9,4]].forEach(a=>c.fillRect(...a))}else{c.fillRect(-7,-88,14,5);c.fillStyle='#8f2020';c.fillRect(-2,-86,2,2)}}
+ if(F.has('absceso')){[[-8,-66],[7,-54]].forEach(([px,py])=>{circ(px,py,5,'#c2410c');circ(px-1,py-1,2.5,'#fcd34d')})}
+ if(F.has('olor')){c.strokeStyle='rgba(130,200,60,.55)';c.lineWidth=1.2;for(let j=-1;j<=1;j++){c.beginPath();for(let s=0;s<12;s++){c.lineTo(j*14+Math.sin(t/150+s+j)*3,-40-s*5-((t/30)%10))}c.stroke()}}
+ if(F.has('chancro')){circ(0,-40,3.5,'#c0262d');circ(0,-40,1.6,'#f0b8a8')}
+ if(F.has('rash')){c.fillStyle='#b4652c';hands.forEach(([hx,hy2])=>{c.fillRect(hx-2,hy2-1,1.6,1.6);c.fillRect(hx+1,hy2+1,1.6,1.6)});c.fillRect(-9,-6,1.6,1.6);c.fillRect(6,-5,1.6,1.6)}
+ if(F.has('erisipela')){c.fillStyle='#d81b3a';c.fillRect(3,-34,8,14);c.strokeStyle='#7a0b1d';c.lineWidth=1;c.strokeRect(3,-34,8,14)}
+ if(F.has('caverna')){circ(-4,-68,5,'#120d0d');for(let j=0;j<3;j++){const L=((t/8+j*12)%30);c.fillStyle='rgba(220,220,220,'+(0.5-L/60)+')';c.fillRect(-4+L,-70+j*2,3,1)}}
+ if(F.has('muguet')&&false){}
+ if(F.has('pseudohifa')){c.strokeStyle='#e8e6da';c.lineWidth=1;hands.forEach(([hx,hy2],i)=>{const sg=i?1:-1;c.beginPath();c.moveTo(hx,hy2);for(let s=1;s<5;s++)c.lineTo(hx+sg*s*3,hy2-s*2+(s%2)*2);c.stroke();for(let s=1;s<5;s++)circ(hx+sg*s*3,hy2-s*2+(s%2)*2,1,'#e8e6da')})}
+ if(F.has('cateter')){c.strokeStyle='#d6e4ea';c.lineWidth=1;c.beginPath();c.moveTo(hands[0][0],hands[0][1]);c.quadraticCurveTo(-48,-90,-40,-110);c.stroke();c.fillStyle='rgba(200,230,240,.7)';c.fillRect(-46,-124,12,14)}
+ if(F.has('moho')){const mc=d.mohoC||'#7fae6a';c.strokeStyle=mc;c.lineWidth=1.1;for(let j=0;j<12;j++){const a=-Math.PI*0.95+j/11*Math.PI*0.9,len=8+(j%3)*4+Math.sin(t/300+j)*1.5,bx=Math.cos(a)*11,by=hy+Math.sin(a)*11;c.beginPath();c.moveTo(bx,by);c.lineTo(bx+Math.cos(a)*len,by+Math.sin(a)*len);c.stroke();circ(bx+Math.cos(a)*len,by+Math.sin(a)*len,1.6,mc)}}
+ if(F.has('bola')){circ(4,-66,6,'#5b7d4a');c.strokeStyle='#9cc58a';c.lineWidth=0.7;for(let j=0;j<8;j++){const a=j/8*7;c.beginPath();c.moveTo(4+Math.cos(a)*6,-66+Math.sin(a)*6);c.lineTo(4+Math.cos(a)*8,-66+Math.sin(a)*8);c.stroke()}}
+ if(F.has('vidrio')){c.fillStyle='rgba(235,245,255,.45)';for(let j=0;j<10;j++)c.fillRect(-12+(j%5)*5,-76+Math.floor(j/5)*9,3,4)}
+ if(F.has('anillo')){[[-8,-70],[8,-56],[-26,-68]].forEach(([px,py])=>{c.strokeStyle='#d6372e';c.lineWidth=1.6;c.beginPath();c.arc(px,py,4,0,7);c.stroke()})}
+ if(F.has('nodulos')){for(let j=0;j<5;j++){const f=j/5,px=hands[0][0]*(1-f)+(-15)*f,py=hands[0][1]*(1-f)+(-78)*f;circ(px,py,1.9,'#b33a2c')}}
+ if(F.has('escara')){c.fillStyle='#0c0c0c';c.beginPath();c.arc(0,hy,12,-1.2,1.6);c.fill();c.fillStyle='#3a1414';c.fillRect(4,hy+1,3,2)}
+ if(F.has('cometa')){hands.forEach(([hx,hy2],i)=>{const sg=i?1:-1,L=(t/4)%20;c.strokeStyle='rgba(255,200,120,.8)';c.lineWidth=1;c.beginPath();c.moveTo(hx,hy2);c.lineTo(hx+sg*(6+L),hy2-2);c.stroke();circ(hx+sg*(6+L),hy2-2,1.5,'#ffe08a')})}
+ // accesorios
+ if(F.has('queso')){poly([hands[1][0]-2,hands[1][1]-6,hands[1][0]+9,hands[1][1]-2,hands[1][0]-2,hands[1][1]+3],'#f2c94c')}
+ if(F.has('rosa')){c.strokeStyle='#2f7a3a';c.lineWidth=1;c.beginPath();c.moveTo(hands[1][0],hands[1][1]);c.lineTo(hands[1][0]+3,hands[1][1]-12);c.stroke();circ(hands[1][0]+3,hands[1][1]-13,2.6,'#d61f45')}
+ if(F.has('frasco')){c.fillStyle='rgba(200,60,40,.85)';c.fillRect(hands[1][0]-3,hands[1][1]-1,7,9);c.fillStyle='#bbb';c.fillRect(hands[1][0]-3,hands[1][1]-3,7,2)}
+ if(F.has('tabaco')){c.fillStyle='#efe6d0';c.fillRect(5,hy+5,7,1.6);c.fillStyle='#ff6a00';c.fillRect(12,hy+5,1.4,1.6);c.fillStyle='rgba(200,200,200,.5)';c.beginPath();c.arc(14+Math.sin(t/200)*2,hy-((t/40)%10),1.6,0,7);c.fill()}
+ if(F.has('blando')){c.globalAlpha=1}
+ if(F.has('boss')){c.fillStyle='#7a1b1b';for(let j=-2;j<=2;j++){poly([j*5-2,hy-10,j*5,hy-18-Math.abs(j)*-1,j*5+2,hy-10],'#7a1b1b')}}
+ c.restore();
+ // fauna
+ if(F.has('rata')){const rx=24+Math.sin(t/400)*6;c.fillStyle='#6b6b6b';c.beginPath();c.ellipse(rx,-2,5,2.5,0,0,7);c.fill();c.fillRect(rx+4,-4,2,2);c.strokeStyle='#8a7070';c.lineWidth=0.6;c.beginPath();c.moveTo(rx-5,-2);c.lineTo(rx-10,-4);c.stroke()}
+ if(F.has('paloma')){const px=-26,py=-3+Math.abs(Math.sin(t/180))*-2;c.fillStyle='#9aa0a8';c.beginPath();c.ellipse(px,py,5,3,0,0,7);c.fill();circ(px-4,py-3,2,'#8b929b');c.fillStyle='#f59e0b';c.fillRect(px-7,py-3,2,1)}
+ if(F.has('gato')){const px=26;c.fillStyle='#d58a3a';c.fillRect(px-4,-6,9,5);circ(px+5,-7,2.6,'#d58a3a');poly([px+3,-9,px+4,-12,px+5,-9],'#d58a3a');poly([px+6,-9,px+7,-12,px+8,-9],'#d58a3a')}
+ if(F.has('murcielago')){for(let j=0;j<3;j++){const a=t/500+j*2.1,bx=Math.cos(a)*24,by=-104+Math.sin(a*1.3)*8,fl=Math.sin(t/60+j)*2;c.fillStyle='#111';c.beginPath();c.moveTo(bx-5,by-fl);c.lineTo(bx,by+1);c.lineTo(bx+5,by-fl);c.lineTo(bx,by-1);c.fill()}}
+ // escudo de resistencia
+ const sh=now()-e.shield;if(sh<600){c.strokeStyle='rgba(120,255,160,'+(1-sh/600)+')';c.lineWidth=3;c.beginPath();c.ellipse(0,-58,40+sh/30,70+sh/30,0,0,7);c.stroke()}
+ c.restore();
+}
+function drawGun(t){
+ const tab=TABS.find(x=>x.id===S.tab),rc=S.recoil*8,bob=Math.sin(t/400)*1.2;
+ c.save();c.translate(0,rc+bob);
+ // guantes de nitrilo
+ poly([118,180,140,150,150,152,140,180],'#5aa9d6');poly([202,180,180,150,170,152,180,180],'#4f9cc8');
+ // cuerpo de la jeringa
+ poly([146,180,174,180,169,128,151,128],'#d9e2e4');
+ c.fillStyle=tab.c;c.fillRect(153,134,14,36);
+ c.fillStyle='rgba(255,255,255,.35)';c.fillRect(154,134,2,36);
+ c.fillStyle='#3c4a4e';for(let i=0;i<5;i++)c.fillRect(151,136+i*7,4,1);
+ c.fillStyle='#9aa7ab';c.fillRect(150,126,20,3);
+ c.fillStyle='#c8cfd2';c.fillRect(159,112,2,14);
+ c.restore();
+ S.recoil*=0.85;
+}
+let last=now();
+function frame(t){
+ c.clearRect(0,0,320,180);
+ drawCorridor(t);
+ const e=S.enemy;
+ if(e){
+  const target=[1.0,0.76,0.55,0.38][e.dist];e.disp+=(target-e.disp)*0.06;
+  let s=e.disp*(e.d.boss?1.15:1);
+  const x=160+Math.sin(t/900)*7*e.disp,fy=96+72*e.disp;
+  const hit=now()-e.hitT;const shake=hit<200?Math.sin(hit/12)*3:0;
+  if(e.dying>=0){const dt=(now()-e.dying)/1000;c.globalAlpha=Math.max(0,1-dt);c.save();c.translate(0,dt*30);drawZombie(e,x+shake,fy,s*1.18*(1-dt*0.3),t);c.restore();c.globalAlpha=1;
+   c.fillStyle='rgba(90,160,60,'+Math.min(0.7,dt)+')';c.beginPath();c.ellipse(x,fy,40*s*Math.min(1,dt*2),6*s,0,0,7);c.fill()}
+  else drawZombie(e,x+shake,fy,s*1.18,t);
+  // disparos
+  S.shots=S.shots.filter(sh=>{const p=(now()-sh.t0)/260;if(p>1.2)return false;const pp=Math.min(1,p);const tx=x,ty=fy-70*s;const px=160+(tx-160)*pp,py=112+(ty-112)*pp;
+   c.fillStyle=sh.col;c.beginPath();c.arc(px,py,3*(1-pp*0.5),0,7);c.fill();c.globalAlpha=0.4;c.beginPath();c.arc(160+(tx-160)*pp*0.8,112+(ty-112)*pp*0.8,2,0,7);c.fill();c.globalAlpha=1;
+   if(p>1){c.fillStyle='rgba(255,255,255,'+(1.2-p)*4+')';c.beginPath();c.arc(tx,ty,10,0,7);c.fill()}return true});
+  S.floats=S.floats.filter(f=>{const p=(now()-f.t0)/1100;if(p>1)return false;c.font='bold 12px "Pixelify Sans",monospace';c.textAlign='center';c.fillStyle='#000';c.fillText(f.txt,x+1,fy-110*s-p*16+1);c.fillStyle=f.col;c.globalAlpha=1-p;c.fillText(f.txt,x,fy-110*s-p*16);c.globalAlpha=1;return true});
+ }
+ drawGun(t);
+ // daño recibido y alarma
+ const ht=now()-S.hurtT;if(ht<350){c.fillStyle='rgba(200,0,0,'+(0.4*(1-ht/350))+')';c.fillRect(0,0,320,180)}
+ if(S.started&&S.hp<30&&S.hp>0){c.fillStyle='rgba(180,0,0,'+(0.08+0.06*Math.sin(t/200))+')';c.fillRect(0,0,320,180)}
+ // scanlines + viñeta
+ c.fillStyle='rgba(0,0,0,.13)';for(let y=0;y<180;y+=2)c.fillRect(0,y,320,1);
+ const g=c.createRadialGradient(160,90,60,160,90,200);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(0,0,0,.55)');c.fillStyle=g;c.fillRect(0,0,320,180);
+ requestAnimationFrame(frame);
+}
+renderTabs();render();menu();requestAnimationFrame(frame);
+</script>
+</body>
+</html>
