@@ -21,6 +21,8 @@ Juego educativo de Microbiología I (medicina, USAL). Shooter por turnos en prim
   - `nul`: sin efecto con explicación específica
   - `allAb` / `abHurt`: caso ECEH (todo ATB empeora)
   - `ficha`: morfología, virulencia, cuadro, tratamiento, trampa de examen
+- `CASOS` (después de `E`): varios pacientes por patógeno. `c0` nombra el cuadro del caso base (el del propio `E`); cada caso de `v` trae `cuadro`, `sint` (opcional), `pistas` (`interrogatorio` 4, `examen` 2, `lab` 3 opcional: si falta usa el del base), `clave` y `diferenciales` (opcional). Si el cuadro cambia el tratamiento, el caso trae `best`/`ok`/`res`/`nul`: cada arma listada ahí se saca de las otras categorías del base (ej.: pielonefritis saca la nitrofurantoína de `best`). `caseOf(id, ci)` arma el paciente; `nextEnemy()` elige el caso, `rec.ci` lo guarda para el repaso y `dex[id].cs` cuenta los cuadros vistos.
+- Los patógenos sumados con `E.push(...)` (S. agalactiae, Proteus, C. psittaci, Coccidioides) se agregan como diferenciales de los viejos en la lista que está justo después de `EBY`.
 - `generic()`: explicaciones por defecto cuando un arma no está listada (vancomicina vs Gram −, aminoglucósidos vs anaerobios, betalactámicos vs sin pared, etc.).
 - `multFor(n)`: bonus del diagnóstico según pistas usadas (×1,6 con hasta 2, baja 0,075 por pista, piso ×1,3). Los turnos gastados en pistas llaman a `enemyTurn(true)` (el ataque pega la mitad).
 - Registro: `say(html, tipo)` agrega una línea a `S.journal`; los tipos y sus filtros están en `TAG` (grupos `p` pistas, `d` disparos, `e` errores). `S.hist` guarda una ficha por sala (pistas vistas, diagnóstico, disparos) que alimenta `repaso()` y `repasoTxt()`.
@@ -36,5 +38,6 @@ Juego educativo de Microbiología I (medicina, USAL). Shooter por turnos en prim
 ## Ideas pendientes
 - Más patógenos (Rickettsia, Bordetella, Nocardia, Actinomyces, M. leprae, Coccidioides, Malassezia).
 - Modo "oral": caso clínico mezclado y hay que justificar el arma.
-- Patógeno nuevo = completar `pistas`, `diferenciales` y `clave`, y sumarlo como diferencial de los bichos con los que se confunde.
+- Patógeno nuevo = completar `pistas`, `diferenciales` y `clave`, sumarlo como diferencial de los bichos con los que se confunde y darle al menos un caso extra en `CASOS`.
+- Fuente de contenido: Notion MICRO 1 → «Hojas de memoria — Síndromes» y los «Resumen completo para el oral» de hongos.
 - Sonido 8-bit y ranking compartido.

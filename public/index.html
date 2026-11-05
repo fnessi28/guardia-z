@@ -269,6 +269,8 @@ const W=[
   desc:{clase:'Antifúngico · equinocandina',mecanismo:'Inhibe la β-1,3-glucano sintasa de la pared fúngica.',cubre:'Candida (incluidas krusei y glabrata): elección en candidemia. Aspergillus de rescate.',noCubre:'CRYPTOCOCCUS (intrínseca), mucorales, dimórficos. Solo EV; no llega a LCR ni orina.'}},
  {id:'terbi',n:'Terbinafina',tab:'hongo',cls:'af',mech:'Inhibe la escualeno epoxidasa; se acumula en queratina',
   desc:{clase:'Antifúngico · alilamina',mecanismo:'Inhibe la escualeno epoxidasa: falta ergosterol y se acumula escualeno tóxico. Se concentra en queratina.',cubre:'Dermatofitos (tiñas, onicomicosis); Sporothrix como alternativa.',noCubre:'Infecciones sistémicas, levaduras en general.'}},
+ {id:'griseo',n:'Griseofulvina',tab:'hongo',cls:'af',mech:'Frena el huso mitótico; se deposita en la queratina nueva',
+  desc:{clase:'Antifúngico · inhibidor de la mitosis',mecanismo:'Se une a la tubulina y altera los microtúbulos del huso: el hongo no se divide. Se deposita en las células precursoras de queratina, así que la queratina nueva nace protegida. Fungistática.',cubre:'Solo dermatofitos: clásica en la tiña capitis infantil, sobre todo por Microsporum.',noCubre:'Candida, Malassezia y cualquier micosis profunda. Rinde mal en uñas. Inductora del citocromo P450 (baja anticonceptivos y warfarina), teratogénica y fotosensibilizante.'}},
  {id:'nista',n:'Nistatina',tab:'hongo',cls:'af',mech:'Polieno tópico: no se absorbe',
   desc:{clase:'Antifúngico · polieno tópico',mecanismo:'Se une al ergosterol como la anfotericina, pero no se absorbe por vía oral.',cubre:'Candida en mucosas: muguet, candidiasis del pañal y vaginal.',noCubre:'Dermatofitos y cualquier infección sistémica.'}},
  {id:'antitox',n:'Antitoxina / Inmunoglobulina',tab:'sost',cls:'sp',mech:'Neutraliza la toxina circulante (no la ya fijada)',
@@ -768,7 +770,791 @@ const E=[
  res:{vori:'Mucorales: RESISTENCIA INTRÍNSECA a voriconazol.',fluco:'El fluconazol no cubre mucorales.',equino:'Las equinocandinas no tienen actividad útil en mucorales.'},
  ficha:{m:'Mucorales: hifas anchas, no tabicadas, ramificadas a 90°.',v:'Angioinvasión, avidez por hierro, crecimiento rapidísimo.',c:'Mucormicosis rino-órbito-cerebral en diabéticos con cetoacidosis; pulmonar en neutropénicos.',t:'Cirugía + anfotericina B liposomal + corregir la enfermedad de base. Alternativa: posaconazol o isavuconazol.',x:'El voriconazol no sirve y hasta favorece su aparición.'}}
 ];
+/* ---------- PATÓGENOS SUMADOS DESDE LAS HOJAS DE SÍNDROMES Y LOS RESÚMENES DE HONGOS ---------- */
+E.push(
+{id:'sagal',n:'Streptococcus agalactiae (grupo B)',f:1,stain:'pos',feats:['cadena','fiebre'],
+ clave:'Hisopado materno + sin profilaxis intraparto + bolsa rota más de 18 horas + sepsis en las primeras 24 horas + coco en cadena catalasa − bacitracina R CAMP +',
+ pistas:{interrogatorio:['Recién nacido de 18 horas, de término.','La madre tuvo hisopado vaginal y rectal positivo a las 36 semanas.','No llegó a recibir penicilina intraparto; la bolsa estuvo rota 20 horas y tuvo fiebre en el parto.','Evolución: desde hace 6 horas, quejido y mala succión.'],
+  examen:['Quejido, taquipnea, tiraje y mala perfusión periférica.','Distermia y letargo; fontanela normotensa.'],
+  lab:['Hemocultivo: cocos Gram + en pares y cadenas cortas.','Cultivo: β-hemólisis estrecha, catalasa −, bacitracina RESISTENTE, CAMP +, hipurato +.','Aglutinación con antisuero del grupo B de Lancefield.']},
+ diferenciales:{listeria:'Listeria es un bacilo Gram + corto, catalasa + y con movilidad en volteretas.',ecoli:'E. coli es bacilo Gram − lactosa +.',spyo:'S. pyogenes es bacitracina SENSIBLE y CAMP −.',entero:'Enterococcus no es β-hemolítico y crece en NaCl 6,5% y bilis-esculina.'},
+ sint:'Un bebé gris, con quejido, y de los dedos le cuelgan cadenas cortas de cocos.',
+ atk:[['Cápsula con ácido siálico','frena la vía alternativa del complemento: el neonato sin anticuerpos maternos queda desnudo.'],['C5a peptidasa','corta tu C5a y los neutrófilos no llegan.'],['β-hemolisina','perfora el epitelio pulmonar del recién nacido.']],
+ best:{penG:'Penicilina G: elección cuando se identifica; nunca perdió sensibilidad.',amoxi:'Ampicilina: elección empírica en el neonato (cubre también Listeria), junto a gentamicina.'},
+ ok:{genta:'Gentamicina: se suma en sinergia en el esquema empírico, no sirve sola.',ceftri:'Cefalosporina de 3.ª (cefotaxima en el neonato): se agrega si hay meningitis.',cefa1:'Cefazolina: alternativa de profilaxis intraparto en alérgicas sin anafilaxia.'},
+ ficha:{m:'Coco Gram + en cadena, β-hemolítico, grupo B de Lancefield; catalasa −, bacitracina resistente, CAMP + e hipurato +.',v:'Cápsula polisacárida con ácido siálico, C5a peptidasa, β-hemolisina/citolisina.',c:'Sepsis, neumonía y meningitis neonatal (precoz en la 1.ª semana, tardía hasta los 3 meses); infección puerperal; bacteriemia en diabéticos y ancianos.',t:'Penicilina o ampicilina (+ gentamicina en el empírico). Prevención: hisopado vaginal y rectal a las 35-37 semanas y penicilina intraparto si es positivo.',x:'Es bacitracina RESISTENTE y CAMP + (S. pyogenes es bacitracina sensible). La profilaxis intraparto previene la forma precoz, no la tardía.'}},
+{id:'proteus',n:'Proteus mirabilis',f:2,stain:'neg',feats:['fuego','olor'],
+ clave:'Litiasis recurrente + orina alcalina con estruvita + cálculo coraliforme + swarming + ureasa + = Proteus mirabilis',
+ pistas:{interrogatorio:['Mujer de 50 años.','Tiene cálculos renales recurrentes y varias ITU por año.','No está sondada; no tomó antibióticos recientes.','Evolución: 3 días de fiebre, dolor lumbar izquierdo y hematuria.'],
+  examen:['Puñopercusión izquierda positiva.','Orina turbia con olor fuerte a amoníaco.'],
+  lab:['Sedimento: pH de 8 con cristales de estruvita (fosfato amónico magnésico). Gram: bacilos Gram −.','Agar sangre: velo invasor (swarming) por sus flagelos peritricos; lactosa −, H₂S +.','Ureasa + intensa. Rx: cálculo coraliforme que ocupa la pelvis renal.']},
+ diferenciales:{ecoli:'E. coli fermenta la lactosa, no es ureasa + y no hace swarming.',kleb:'Klebsiella es inmóvil y lactosa +.',pseudo:'Pseudomonas es no fermentador y oxidasa +.',entero:'Enterococcus es coco Gram + catalasa −.'},
+ sint:'Deja un rastro de cristales al caminar y el aire a su alrededor huele a amoníaco.',
+ atk:[['Ureasa','parte la urea en amoníaco: alcaliniza la orina y precipitan cálculos de estruvita.'],['Flagelos peritricos','nada contra el chorro de orina y sube hasta el riñón.'],['Fimbrias MR/P','se pega al urotelio y a los cálculos, donde queda a salvo del antibiótico.']],
+ best:{ceftri:'Ceftriaxona: cubre P. mirabilis y llega al riñón. (Y el cálculo hay que sacarlo: es un reservorio.)',cipro:'Ciprofloxacina: buena llegada al parénquima renal si es sensible.'},
+ ok:{amoxi:'P. mirabilis suele ser sensible a la ampicilina (a diferencia de P. vulgaris), pero se usa con antibiograma.',tmp:'TMP-SMX: sirve si el antibiograma lo permite.',genta:'Gentamicina: activa en orina.'},
+ res:{nitro:'Resistencia intrínseca a la nitrofurantoína.',colis:'Resistencia intrínseca a las polimixinas: su LPS está modificado y la colistina no se une.',doxi:'Resistencia intrínseca a las tetraciclinas (bombas de eflujo).'},
+ ficha:{m:'Bacilo Gram − móvil (flagelos peritricos), lactosa −, H₂S +, ureasa +, swarming en agar sangre.',v:'Ureasa, flagelos, fimbrias, hemolisina; forma biofilm en sondas y cálculos.',c:'ITU complicada con litiasis de estruvita (cálculos coraliformes), ITU asociada a sonda con incrustaciones, bacteriemia.',t:'Cefalosporinas de 3.ª, quinolonas o ampicilina según antibiograma; extraer el cálculo o cambiar la sonda.',x:'Resistencia intrínseca a nitrofurantoína, colistina y tetraciclinas. La ureasa alcaliniza la orina: por eso hace cálculos.'}},
+{id:'psittaci',n:'Chlamydia psittaci',f:3,stain:'nada',flags:{intracel:1},feats:['tos','fiebre','confuso'],
+ clave:'Loro que murió + fiebre alta con cefalea intensa + tos seca + esplenomegalia + bradicardia relativa + serología + = psitacosis',
+ pistas:{interrogatorio:['Hombre de 55 años.','Compró un loro hace 3 semanas; el ave se enfermó y murió.','Limpió la jaula con excremento seco sin protección.','Evolución: 5 días de fiebre alta, escalofríos, mialgias, cefalea intensa y tos seca.'],
+  examen:['Esplenomegalia y bradicardia relativa.','Crepitantes escasos para lo enfermo que está; algo confuso.'],
+  lab:['Gram del esputo: no se ve nada (parásito intracelular obligado).','Rx: infiltrado intersticial más florido que la clínica. No crece en medios comunes: solo en cultivo celular, peligroso.','Fijación de complemento con aumento de 4 veces / PCR de C. psittaci +.']},
+ diferenciales:{legio:'Legionella se asocia a torres de enfriamiento, con diarrea, hiponatremia y antígeno urinario +.',myco:'Mycoplasma afecta jóvenes sin contacto con aves y da crioaglutininas.',typhi:'la fiebre tifoidea da roséola y crece en hemocultivo; no hay aves.',chlam:'C. trachomatis da infecciones genitales y neumonía en lactantes, no en el dueño de un loro.',brucella:'Brucella viene de vacas y cabras, con fiebre ondulante.'},
+ sint:'Tose seco, se agarra la cabeza y tiene plumas verdes pegadas en el camisolín.',
+ atk:[['Cuerpo elemental','la forma infectante resiste el ambiente seco y se inhala con el polvo de excremento.'],['Diseminación al SRE','se multiplica en hígado y bazo antes de llegar al pulmón.'],['Compromiso del SNC','cefalea intensa y confusión: frecuente en la psitacosis.']],
+ best:{doxi:'Doxiciclina: elección; llega adentro de la célula donde se replica.'},
+ ok:{macro:'Macrólido: alternativa en embarazadas y chicos.'},
+ ficha:{m:'Bacteria Gram − pequeña, intracelular obligada, con ciclo de cuerpo elemental (infectante) y reticular (replicativo).',v:'Cuerpo elemental resistente, inhibición de la fusión del fagolisosoma, LPS.',c:'Neumonía atípica con fiebre alta, cefalea intensa, esplenomegalia, compromiso hepático y del SNC. Zoonosis de loros y aves.',t:'Doxiciclina; macrólidos como alternativa.',x:'No crece en medios comunes: el diagnóstico es serológico o por PCR. Los betalactámicos no sirven (intracelular).'}},
+{id:'cocci',n:'Coccidioides',f:4,kind:'hongo',stain:'azul',feats:['tos','erisipela','fiebre'],
+ clave:'Oeste árido + polvo de excavación + neumonía con artralgias y eritema nodoso + esférulas con endosporas + artroconidios en tonel',
+ pistas:{interrogatorio:['Hombre de 30 años, obrero de la construcción.','Trabaja en excavaciones en San Juan, con tormentas de polvo frecuentes.','Es diabético.','Evolución: 2 semanas de fiebre, tos seca, dolor torácico, cansancio y dolor articular.'],
+  examen:['Nódulos rojos dolorosos en las piernas: eritema nodoso (signo de buena inmunidad celular).','Artralgias en tobillos y rodillas; crepitantes en un campo.'],
+  lab:['KOH del esputo: esférulas GRANDES de doble pared llenas de endosporas (no es una levadura).','Cultivo (avisar al laboratorio: el hongo más infeccioso de la micología): moho blanco a 28 y 37 °C con artroconidios en tonel alternados con células vacías.','Precipitinas IgM + y fijación de complemento IgG con título moderado.']},
+ diferenciales:{histo:'Histoplasma vive en el guano de la pampa húmeda y forma levaduras chiquitas intracelulares.',paraco:'Paracoccidioides es del NEA y forma levaduras en rueda de timón.',tbc:'la TBC tiene BAAR y no esférulas.',crypto:'Cryptococcus es una levadura capsulada con tinta china +.'},
+ sint:'Tose polvo del desierto y tiene manchas rojas dolorosas en las piernas.',
+ atk:[['Esférula gigante','demasiado grande para que un macrófago la fagocite.'],['Endosporas','cada esférula que estalla libera cientos de esférulas nuevas.'],['Artroconidios','unos pocos alcanzan para infectarte: viajan en el polvo.']],
+ best:{fluco:'Fluconazol: elección en formas progresivas o con factores de riesgo (como la diabetes); llega bien a todos lados.'},
+ ok:{itra:'Itraconazol: alternativa, preferido si hay compromiso óseo.',anfo:'Anfotericina B: para formas graves o en el embarazo.'},
+ nul:{equino:'Las equinocandinas tienen actividad pobre e irregular frente a los dimórficos.',nista:'La nistatina no se absorbe: no sirve en una micosis sistémica.'},
+ ficha:{m:'Hongo dimórfico «nutricional»: moho hialino con artroconidios en tonel alternados con células vacías en el ambiente y el cultivo; esférulas con endosporas en el tejido.',v:'Tamaño de la esférula (no fagocitable), liberación de endosporas, enzimas antioxidantes en los artroconidios.',c:'Primoinfección asintomática (60%) o «fiebre del valle» con artralgias y eritema nodoso; pulmonar crónica cavitada; diseminada a piel, hueso y SNC (meningitis basilar).',t:'Observación en formas leves; fluconazol o itraconazol en progresivas; fluconazol de por vida en meningitis; anfotericina B si es grave o hay embarazo.',x:'Su forma parasitaria NO es una levadura sino una esférula, y en el Sabouraud a 37 °C sigue creciendo como moho. Es del oeste árido argentino, no del NEA.'}}
+);
+
+/* ============ CASOS: varios pacientes por patógeno ============ */
+// c0 nombra el cuadro del caso base (los datos del propio E). Cada caso de v pisa sint, pistas (lab opcional), clave y diferenciales (opcional),
+// y retoca armas: un arma que aparece en best/ok/res/nul del caso se saca de las otras categorías del base. Lo arma caseOf().
+const CASOS={
+/* ---------- PISO 1 ---------- */
+saureus:{c0:'Infección de herida quirúrgica',v:[
+ {cuadro:'Shock tóxico por tampón',sint:'Roja como un camarón de pies a cabeza, tambaleante, con la presión por el piso.',
+  pistas:{interrogatorio:['Mujer de 19 años, previamente sana.','Está menstruando y usa tampones de alta absorción.','Se olvidó un tampón puesto más de 24 horas.','Evolución: 12 horas de fiebre de 39,5 °C, vómitos, diarrea acuosa y mareos al pararse.'],
+   examen:['Eritrodermia difusa «en quemadura de sol», conjuntivas hiperémicas, TA 80/40 y confusión.','Al retirar el tampón no hay pus ni herida: el foco es mínimo y lo que circula es la toxina.'],
+   lab:['Gram del tampón: cocos Gram + en RACIMOS.','Cultivo: catalasa +, COAGULASA +; la cepa produce TSST-1. Cefoxitina sensible.','Hemocultivos NEGATIVOS: la toxina actúa a distancia. A la semana descaman palmas y plantas.']},
+  clave:'Tampón olvidado + fiebre + hipotensión + eritrodermia difusa + hemocultivos negativos + S. aureus productor de TSST-1',
+  diferenciales:{spyo:'el shock tóxico estreptocócico viene con necrosis de partes blandas, dolor intenso y hemocultivos positivos; acá hay un tampón y hemocultivos negativos.',menin:'la meningococcemia da púrpura que no se borra y diplococos Gram −; acá hay eritrodermia y cocos en racimo.',lepto:'la leptospirosis da sufusión conjuntival y mialgia de pantorrillas después de agua contaminada; acá el foco es un tampón.',samr:'el SAMR resiste la cefoxitina; esta cepa es sensible.'},
+  best:{oxa:'Oxacilina: mata al estafilococo SAMS que quedó en la vagina (y se saca el tampón).',clinda:'Clindamicina: actúa en el ribosoma y frena la SÍNTESIS de TSST-1. Se suma al betalactámico para apagar la fábrica de toxina.'}},
+ {cuadro:'Endocarditis tricuspídea en usuario de drogas EV',sint:'Tose sangre a borbotones y tiene los brazos llenos de pinchazos.',
+  pistas:{interrogatorio:['Hombre de 28 años.','Se inyecta drogas por vía endovenosa y comparte jeringas.','Nunca tuvo problemas cardíacos.','Evolución: 5 días de fiebre alta con escalofríos y tos con puntada de costado.'],
+   examen:['Soplo holosistólico NUEVO en foco tricuspídeo que aumenta con la inspiración.','Marcas de punción en ambos brazos y hemorragias subungueales en astilla.'],
+   lab:['Hemocultivos: 3 de 3 positivos con cocos Gram + en RACIMOS (bacteriemia continua).','Cultivo: catalasa +, COAGULASA +. Cefoxitina sensible: SAMS.','Eco: vegetación en la tricúspide. Rx: nódulos pulmonares cavitados (émbolos sépticos del lado derecho).']},
+  clave:'Drogas EV + fiebre aguda + soplo tricuspídeo + émbolos pulmonares + 3/3 hemocultivos con S. aureus = endocarditis aguda derecha',
+  diferenciales:{entero:'Enterococcus da endocarditis SUBAGUDA en ancianos tras manipulación urológica, y es catalasa −.',pseudo:'Pseudomonas también aparece en endocarditis de usuarios de drogas, pero es un bacilo Gram − no fermentador.',samr:'el SAMR resiste la cefoxitina; esta cepa es sensible.',ckru:'Candida da vegetaciones grandes en usuarios de drogas y prótesis, pero el hemocultivo muestra levaduras, no cocos.'},
+  best:{oxa:'Oxacilina EV durante 4 a 6 semanas: la vegetación no tiene vasos ni fagocitos, así que hace falta un bactericida, endovenoso y prolongado.',cefa1:'Cefazolina EV: alternativa bactericida en SAMS.'},
+  nul:{tmp:'El TMP-SMX sirve en piel, no en endocarditis: acá hace falta un bactericida EV (el resumen de la cátedra se equivoca en esto).',clinda:'Clindamicina es bacteriostática: en una vegetación sin fagocitos no alcanza.'}},
+ {cuadro:'Síndrome de piel escaldada',sint:'Un bebé al que la piel se le desliza como papel mojado con solo tocarlo.',
+  pistas:{interrogatorio:['Lactante de 3 semanas.','Nació a término, sin complicaciones; tuvo el ombligo húmedo y con costras.','La madre tuvo un forúnculo en la axila la semana pasada.','Evolución: 24 horas de fiebre, irritabilidad y un eritema que empezó alrededor de la boca y los ojos.'],
+   examen:['Ampollas flácidas que se rompen; al frotar la piel sana se despega (Nikolsky +).','Las mucosas están respetadas y se curan sin cicatriz: el corte es intraepidérmico.'],
+   lab:['Líquido de la ampolla: ESTÉRIL, sin bacterias ni PMN. La toxina actúa a distancia.','Hisopado del ombligo: cocos Gram + en racimo, catalasa +, coagulasa +.','La cepa produce exfoliatinas A y B, que cortan la desmogleína-1. Cefoxitina sensible.']},
+  clave:'Lactante + ampollas flácidas con Nikolsky + ampolla estéril + foco umbilical con S. aureus productor de exfoliatinas',
+  diferenciales:{spyo:'el impétigo no ampolloso por S. pyogenes da costras melicéricas, no despegamiento difuso con Nikolsky (la cátedra a veces atribuye el SPEE a Streptococcus: es S. aureus).',listeria:'la listeriosis neonatal da sepsis con microabscesos, no despegamiento cutáneo.',samr:'el SAMR resiste la cefoxitina; esta cepa es sensible.',sagal:'S. agalactiae da sepsis o meningitis neonatal, no ampollas por toxina.'}}]},
+
+spyo:{c0:'Faringitis y escarlatina',v:[
+ {cuadro:'Erisipela',sint:'Una placa roja, brillante y caliente le sube por la pierna con un borde que parece dibujado con regla.',
+  pistas:{interrogatorio:['Mujer de 68 años, obesa, con insuficiencia venosa.','Tiene pie de atleta crónico con fisuras entre los dedos.','No tuvo heridas grandes ni contacto con tierra.','Evolución: 24 horas; empezó con escalofrío intenso y fiebre antes de la mancha.'],
+   examen:['Placa roja, caliente, dolorosa, SOBREELEVADA y de bordes NETOS en la pierna (dermis superficial).','Fisuras maceradas en el 4.º espacio interdigital: la puerta de entrada.'],
+   lab:['Gram del hisopado de la fisura: cocos Gram + en CADENAS.','Cultivo: β-hemólisis completa, catalasa −, bacitracina sensible, PYR +.','ASTO elevado. Hemocultivos negativos: el diagnóstico es clínico.']},
+  clave:'Placa roja de borde NETO y sobreelevado + fisura interdigital + escalofrío previo + estreptococo β-hemolítico grupo A = erisipela',
+  diferenciales:{saureus:'S. aureus da celulitis más purulenta, con abscesos y borde difuso; la erisipela de borde neto es estreptocócica.',perfri:'la gangrena gaseosa da crepitación y bullas oscuras después de una herida con tierra.',dermato:'la tiña da una placa anular con centro claro y prurito, sin fiebre.',pseudo:'el ectima gangrenoso de Pseudomonas es una úlcera necrótica en neutropénicos.'}},
+ {cuadro:'Fascitis necrotizante',sint:'Grita de dolor por una pierna que apenas está roja, y la piel se le pone violeta mientras lo mirás.',
+  pistas:{interrogatorio:['Hombre de 50 años, diabético.','Hace dos días se golpeó la pierna jugando al fútbol; tomó antiinflamatorios.','No hubo herida con tierra ni cirugía.','Evolución: 36 horas de dolor que no para de crecer, y ahora fiebre y mareos.'],
+   examen:['Dolor DESPROPORCIONADO a lo que se ve; piel tensa, violácea, con ampollas y zonas anestesiadas.','TA 85/50, taquicardia: shock. Sin crepitación.'],
+   lab:['Gram del tejido desbridado: cocos Gram + en CADENAS; no hay bacilos grandes.','Cultivo: β-hemólisis, bacitracina sensible: grupo A. Hemocultivos positivos.','CPK elevada, creatinina en ascenso: shock tóxico estreptocócico.']},
+  clave:'Dolor desproporcionado + piel violácea con ampollas + shock + cocos en cadena en el desbridamiento = fascitis necrotizante por S. pyogenes',
+  diferenciales:{perfri:'C. perfringens da crepitación con gas y bacilos Gram + grandes sin esporas.',saureus:'S. aureus forma racimos y es catalasa +; rara vez da fascitis.',bfrag:'las fascitis mixtas con anaerobios dan olor fétido y gas; acá hay solo cocos en cadena.',pseudo:'el ectima de Pseudomonas es una úlcera necrótica en neutropénicos, no una fascitis en un sano.'},
+  best:{penG:'Penicilina en dosis altas + desbridamiento quirúrgico urgente.',clinda:'Clindamicina: frena la síntesis de proteína M y toxinas aunque haya un inóculo enorme en fase estacionaria, donde la penicilina pierde eficacia (efecto Eagle).'},
+  ok:{amoxi:'Sirve como betalactámico, pero acá van dosis altas EV y el combo con clindamicina.'}},
+ {cuadro:'Impétigo',sint:'Una nena con costras color miel alrededor de la nariz que se le pegan a todo.',
+  pistas:{interrogatorio:['Nena de 4 años.','Es verano y tenía picaduras de mosquito que se rascó.','Dos compañeritos del jardín tienen lo mismo.','Evolución: 5 días; empezó con granitos que se volvieron costras.'],
+   examen:['Costras MELICÉRICAS (color miel) perinasales y peribucales, sobre base erosionada.','Adenopatía submaxilar; sin fiebre y sin ampollas.'],
+   lab:['Gram de la lesión: cocos Gram + en cadenas.','Cultivo: β-hemólisis, catalasa −, bacitracina sensible.','La ASTO casi no sube en las infecciones de piel (los lípidos cutáneos inactivan la estreptolisina O): se eleva la anti-DNasa B.']},
+  clave:'Nena en verano + costras melicéricas + brote en el jardín + estreptococo grupo A con anti-DNasa B = impétigo no ampolloso',
+  diferenciales:{saureus:'el impétigo AMPOLLOSO es por S. aureus (exfoliatina): ampollas, no costras melicéricas.',dermato:'la tiña corporis da anillos con borde activo y prurito, sin costras melicéricas.',difteria:'la difteria cutánea da úlceras con membrana grisácea en no vacunados.'},
+  ok:{cefa1:'Cefalexina oral: muy usada porque cubre también a S. aureus, que suele acompañar.'}}]},
+
+spneu:{c0:'Neumonía lobar',v:[
+ {cuadro:'Meningitis',sint:'Rígida como una tabla, con pus saliéndole del oído.',
+  pistas:{interrogatorio:['Mujer de 45 años, ESPLENECTOMIZADA tras un accidente.','Nunca recibió la vacuna antineumocócica.','Hace 3 días tuvo otitis media derecha.','Evolución: 12 horas de cefalea intensa, fiebre, vómitos y confusión.'],
+   examen:['Rigidez de nuca, Kernig y Brudzinski positivos.','Otorrea purulenta derecha. Sin petequias.'],
+   lab:['LCR turbio: DIPLOCOCOS Gram + lanceolados, muchos PMN, glucorraquia menor de 34, proteínas mayores de 220.','Cultivo: α-hemólisis, catalasa −, sensible a optoquina, soluble en bilis.','Antígeno capsular neumocócico en LCR +. CIM a penicilina ELEVADA (PBP alteradas).']},
+  clave:'Esplenectomizada + otitis previa + meningitis aguda + diplococos Gram + lanceolados en LCR + optoquina sensible',
+  diferenciales:{menin:'el meningococo es diplococo Gram − y suele venir con petequias.',hib:'H. influenzae es cocobacilo Gram − y afecta a chicos no vacunados.',listeria:'Listeria es cocobacilo Gram + en neonatos, mayores de 50 o inmunodeprimidos, y resiste las cefalosporinas.',crypto:'Cryptococcus da meningitis subaguda en VIH, con levaduras capsuladas en tinta china.'},
+  best:{ceftri:'Ceftriaxona: pasa la BHE inflamada y cubre neumococo. Empírico de elección.',vanco:'Vancomicina: se suma por las cepas con PBP alteradas (CIM alta a betalactámicos) hasta tener el antibiograma.'},
+  ok:{penG:'Penicilina solo si la CIM resulta baja.',amoxi:'Ampicilina sirve solo con CIM baja; con PBP alteradas no alcanza concentración útil en LCR.'},
+  nul:{macro:'El macrólido es bacteriostático y casi no llega al LCR: no sirve en meningitis.'}},
+ {cuadro:'Otitis media aguda',sint:'Un bebé que llora sin parar tirándose de la oreja, con un escudo brillante alrededor.',
+  pistas:{interrogatorio:['Nene de 18 meses.','Va a la guardería desde los 6 meses.','Tuvo un resfrío la semana pasada.','Evolución: 2 días de fiebre e irritabilidad; se tira de la oreja derecha.'],
+   examen:['Tímpano derecho rojo, ABOMBADO y sin movilidad en la otoscopía neumática.','Sin exudado amigdalino ni rash. Rinorrea mucosa.'],
+   lab:['Timpanocentesis: diplococos Gram + lanceolados con PMN.','Cultivo: α-hemólisis (verde), catalasa −, sensible a optoquina.','Reacción de Quellung +: la cápsula se hincha con el antisuero específico.']},
+  clave:'Guardería + resfrío previo + tímpano abombado + diplococo Gram + lanceolado optoquina sensible = otitis media por neumococo',
+  diferenciales:{hib:'H. influenzae (no tipificable) también da otitis media, pero es cocobacilo Gram − que necesita factores X y V.',spyo:'S. pyogenes es β-hemolítico y sensible a bacitracina.',pseudo:'Pseudomonas da otitis EXTERNA (oído de nadador), no media con tímpano abombado.'},
+  ok:{amoxiclav:'Amoxi-clavulánico si recibió amoxicilina reciente o se sospecha H. influenzae productor de β-lactamasa.',ceftri:'Ceftriaxona IM: se reserva para la otitis que no responde o el chico que no tolera la vía oral.'}}]},
+
+entero:{c0:'ITU en anciana sondada',v:[
+ {cuadro:'Endocarditis subaguda tras cistoscopía',sint:'Un anciano pálido y flaco con un fueguito en la vejiga y algo raspando en el pecho.',
+  pistas:{interrogatorio:['Hombre de 72 años.','Tiene una válvula aórtica calcificada.','Hace 3 semanas le hicieron una cistoscopía con resección de próstata.','Evolución: 4 semanas de fiebre baja, cansancio y pérdida de peso.'],
+   examen:['Soplo diastólico aórtico NUEVO y esplenomegalia.','Nódulos de Osler dolorosos en los pulpejos.'],
+   lab:['Hemocultivos 3 de 3: cocos Gram + en pares y cadenas cortas.','Cultivo: catalasa −, crece en bilis-esculina y NaCl 6,5%, PYR +. Sin β-lactamasa.','Eco transesofágico: vegetación aórtica.']},
+  clave:'Anciano + manipulación urológica + fiebre de semanas + soplo nuevo + coco Gram + catalasa − que crece en bilis-esculina = endocarditis por Enterococcus',
+  diferenciales:{saureus:'S. aureus da endocarditis AGUDA, en racimos y catalasa +.',spyo:'S. pyogenes es β-hemolítico y no causa endocarditis subaguda (el resumen de la cátedra lo dice: es un error).',samr:'el SAMR es catalasa + y coagulasa +, en racimos.'},
+  best:{amoxi:'Ampicilina: abre la pared del enterococo.',genta:'Gentamicina en SINERGIA: sola no entra al enterococo, pero con la pared abierta por la ampicilina llega al ribosoma. Una vegetación pide bactericida.'},
+  nul:{nitro:'La nitrofurantoína solo concentra en orina: no sirve en bacteriemia ni endocarditis.'}},
+ {cuadro:'Colección abdominal que no responde a cefalosporinas',sint:'Lleva una semana con ceftriaxona y el absceso de la panza sigue ardiendo.',
+  pistas:{interrogatorio:['Mujer de 60 años.','Operada de una perforación de colon hace 10 días.','Recibe ceftriaxona + metronidazol desde la cirugía.','Evolución: la fiebre volvió al 5.º día pese al tratamiento.'],
+   examen:['Dolor y defensa en fosa ilíaca izquierda; el drenaje sale turbio.','Herida quirúrgica sin pus superficial.'],
+   lab:['Gram del drenaje: cocos Gram + en cadenas cortas, junto a algunos bacilos Gram −.','Cultivo: catalasa −, bilis-esculina +, crece en NaCl 6,5%.','Antibiograma: sensible a ampicilina; resistencia intrínseca a todas las cefalosporinas.']},
+  clave:'Cirugía de colon + ceftriaxona en curso + fiebre persistente + coco Gram + catalasa − bilis-esculina + = enterococo seleccionado por cefalosporinas',
+  diferenciales:{bfrag:'B. fragilis es un bacilo Gram − anaerobio, y el metronidazol que recibe ya lo cubre.',ecoli:'E. coli es bacilo Gram − y la ceftriaxona lo cubriría.',cdiff:'C. difficile da diarrea con pseudomembranas, no una colección.',saureus:'S. aureus forma racimos y es catalasa +.'}}]},
+
+listeria:{c0:'Embarazada con queso blando',v:[
+ {cuadro:'Romboencefalitis en trasplantado',sint:'Camina torcido, ve doble y arrastra una nube helada de fiambre.',
+  pistas:{interrogatorio:['Hombre de 68 años, trasplantado renal, toma tacrolimus y prednisona.','Su inmunidad celular está deprimida.','Come paté y fiambre envasado que guarda semanas en la heladera.','Evolución: 2 días de fiebre y cefalea; hoy ve doble y se tambalea.'],
+   examen:['Rigidez de nuca leve, parálisis del VI y VII par, ataxia (tronco encefálico).','Sin petequias.'],
+   lab:['LCR: escasos bacilos cortos Gram + (casi cocobacilos); glucorraquia baja.','Cultivo: β-hemólisis estrecha, catalasa +, movilidad en paraguas a 25 °C; crece a 4 °C.','CAMP + y esculina +. Resistente a cefalosporinas.']},
+  clave:'Inmunidad celular deprimida + fiambre de heladera + meningitis con pares craneales + cocobacilo Gram + catalasa + que crece en frío',
+  diferenciales:{spneu:'el neumococo es diplococo Gram + lanceolado y la ceftriaxona lo cubre.',menin:'el meningococo es diplococo Gram − con petequias.',crypto:'Cryptococcus da meningitis subaguda en VIH, con tinta china +.',tbc:'la meningitis TBC es subaguda, de semanas, con linfocitos y ADA alto.'}},
+ {cuadro:'Granulomatosis infantiséptica',sint:'Un recién nacido hipotónico con granitos blancos en la piel y el olor a queso de la madre.',
+  pistas:{interrogatorio:['Recién nacido de 2 días, prematuro de 35 semanas.','La madre tuvo un cuadro gripal con fiebre la semana antes del parto.','La madre come quesos de campo sin pasteurizar.','Evolución: desde el nacimiento, quejido y rechazo del alimento.'],
+   examen:['Dificultad respiratoria, hipotonía; líquido amniótico teñido de meconio.','Pápulas y microabscesos diseminados en piel y faringe (granulomas).'],
+   lab:['Hemocultivo: bacilos cortos Gram +.','Cultivo: catalasa +, movilidad en volteretas, β-hemólisis tenue.','CAMP +. Placenta con microabscesos.']},
+  clave:'Madre con síndrome gripal + prematuro + microabscesos diseminados + bacilo Gram + catalasa + móvil = listeriosis neonatal precoz',
+  diferenciales:{sagal:'S. agalactiae también es CAMP +, pero es coco Gram + en cadena, catalasa − e inmóvil.',ecoli:'E. coli es bacilo Gram − lactosa +.',entero:'Enterococcus es catalasa − y no tiene movilidad.'}}]},
+
+difteria:{c0:'Difteria faríngea',v:[
+ {cuadro:'Difteria cutánea',sint:'Una úlcera en sacabocado tapada con una membrana gris en la pierna.',
+  pistas:{interrogatorio:['Hombre de 40 años en situación de calle.','No recuerda haber recibido vacunas en la adultez.','Tiene una herida en la pierna que se infectó.','Evolución: 3 semanas; la úlcera no cierra y le duele poco.'],
+   examen:['Úlcera redondeada en sacabocado, de bordes netos, cubierta por una membrana grisácea adherente.','Sin compromiso faríngeo ni cuello de toro.'],
+   lab:['Gram: bacilos Gram + pleomórficos en empalizada y «letras chinas»; gránulos metacromáticos.','Cultivo en Tinsdale (telurito): colonias negras con halo marrón.','Prueba de Elek +: la cepa es toxigénica (gen tox del fago β).']},
+  clave:'Sin refuerzos + úlcera en sacabocado con membrana gris + bacilos en letras chinas + Elek + = difteria cutánea',
+  diferenciales:{spyo:'el ectima estreptocócico da una úlcera con costra, con cocos en cadena.',pseudo:'el ectima gangrenoso de Pseudomonas aparece en neutropénicos y tiene centro negro.',saureus:'S. aureus da pus y forúnculos, con cocos en racimo.'},
+  best:{macro:'Eritromicina o azitromicina: erradica al bacilo y corta la transmisión.',penG:'Penicilina: igual de eficaz para erradicar la bacteria.'},
+  ok:{antitox:'La antitoxina se reserva para signos sistémicos de toxina; en la forma cutánea aislada casi nunca hace falta.'}},
+ {cuadro:'Miocarditis diftérica',sint:'Habla con voz nasal, el líquido le sale por la nariz y el corazón le late a destiempo.',
+  pistas:{interrogatorio:['Varón de 20 años sin vacunas.','Hace 12 días tuvo una angina con una membrana gris que «se fue sola».','Nadie le dio suero ni antibióticos.','Evolución: 3 días de falta de aire y palpitaciones.'],
+   examen:['Ritmo de galope e hipotensión; el ECG muestra un bloqueo AV.','Voz nasal y regurgitación de líquidos por la nariz: parálisis del velo del paladar.'],
+   lab:['Restos de membrana faríngea: bacilos Gram + en letras chinas.','Cultivo en Tinsdale: colonias negras con halo; troponina elevada.','Elek +: la toxina inactiva el EF-2 por ADP-ribosilación y frena la síntesis proteica del miocardio.']},
+  clave:'Angina con membrana gris hace 2 semanas + bloqueo AV + parálisis del velo + Elek + = complicaciones tóxicas de la difteria',
+  diferenciales:{spyo:'la fiebre reumática da carditis semanas después de una faringitis, pero con poliartritis y sin parálisis del velo.',botu:'el botulismo da parálisis descendente simétrica tras una conserva, sin angina previa.',hib:'la epiglotitis da babeo y estridor agudo, sin membrana ni miocarditis.'}}]},
+
+samr:{c0:'Bacteriemia por catéter en terapia',v:[
+ {cuadro:'Neumonía necrotizante de la comunidad',sint:'Un rugbier gigante que tose sangre y tiene forúnculos en los muslos.',
+  pistas:{interrogatorio:['Varón de 20 años, juega al rugby.','Varios compañeros del equipo tienen forúnculos.','Tuvo gripe hace una semana.','Evolución: 24 horas de fiebre alta, hemoptisis y falta de aire.'],
+   examen:['Hipoxemia grave, taquicardia e hipotensión.','Forúnculos en los muslos.'],
+   lab:['Esputo: cocos Gram + en RACIMOS con muchos PMN.','Cultivo: coagulasa +; cefoxitina RESISTENTE (mecA: PBP2a).','Gen de leucocidina de Panton-Valentine +. Rx: cavidades múltiples.']},
+  clave:'Post-influenza + forúnculos en el equipo + hemoptisis + cavidades + S. aureus mecA + con leucocidina PV = SAMR de la comunidad',
+  diferenciales:{spneu:'el neumococo es diplococo lanceolado, catalasa −, sensible a optoquina.',kleb:'Klebsiella es bacilo Gram − capsulado en alcohólicos.',saureus:'el SAMS es sensible a la cefoxitina; este tiene mecA.',tbc:'la caverna TBC es de evolución lenta, con BAAR.'},
+  ok:{clinda:'Clindamicina se suma para frenar la síntesis de leucocidina PV.'}},
+ {cuadro:'Forúnculos recurrentes en la familia',sint:'Toda la familia viene detrás de él, y todos tienen granos con punta de pus.',
+  pistas:{interrogatorio:['Mujer de 35 años.','Es el tercer forúnculo en 4 meses; su hijo y su marido también tienen.','Comparten toallas y van al mismo gimnasio.','Evolución: 4 días; un absceso en el glúteo que creció y fluctúa.'],
+   examen:['Absceso fluctuante de 4 cm con celulitis alrededor y centro necrótico.','Sin fiebre ni compromiso general.'],
+   lab:['Gram del pus drenado: cocos Gram + en racimo.','Cultivo: coagulasa +, cefoxitina RESISTENTE (mecA).','Sensible a TMP-SMX, clindamicina (sin resistencia inducible en D-test) y doxiciclina.']},
+  clave:'Abscesos recurrentes en convivientes + cocos en racimo coagulasa + + mecA + = SAMR de la comunidad en piel',
+  diferenciales:{saureus:'el SAMS es sensible a la cefoxitina.',spyo:'S. pyogenes da erisipela o impétigo, no abscesos, y es catalasa −.',sporo:'la esporotricosis da nódulos que suben por un linfático tras una espina.'},
+  best:{tmp:'Drenaje + TMP-SMX oral: elección en piel por SAMR de la comunidad.',vanco:'Vancomicina EV si hay celulitis extensa, fiebre o falla del oral.'},
+  ok:{doxi:'Doxiciclina oral: alternativa en piel.',clinda:'Clindamicina: sirve si el D-test es negativo.'}}]},
+
+/* ---------- PISO 2 ---------- */
+ecoli:{c0:'Cistitis',v:[
+ {cuadro:'Pielonefritis en embarazada',sint:'Una embarazada doblada de dolor en la cintura, temblando de fiebre.',
+  pistas:{interrogatorio:['Mujer de 26 años, embarazada de 28 semanas.','En el primer trimestre tuvo una bacteriuria asintomática que no se trató.','No tiene sondas ni litiasis conocida.','Evolución: 2 días de fiebre de 39 °C, escalofríos, dolor lumbar derecho y vómitos.'],
+   examen:['Puñopercusión derecha muy dolorosa.','Taquicardia, 39 °C; sin contracciones.'],
+   lab:['Sedimento: piuria con CILINDROS LEUCOCITARIOS (origen renal). Gram: bacilos Gram −.','Cultivo en CLDE: más de 100.000 UFC/ml. MacConkey: lactosa +, indol +.','La cepa tiene fimbrias P (adhesina PapG), que se pegan al urotelio alto.']},
+  clave:'Embarazada + bacteriuria no tratada + fiebre y dolor lumbar + cilindros leucocitarios + E. coli con fimbrias P = pielonefritis',
+  diferenciales:{kleb:'Klebsiella es lactosa + pero inmóvil e indol −, con colonias muy mucosas.',entero:'Enterococcus es coco Gram + catalasa −.',sagal:'S. agalactiae coloniza a la embarazada, pero es coco Gram + en cadena.',proteus:'Proteus es lactosa −, ureasa + y alcaliniza la orina.'},
+  best:{ceftri:'Ceftriaxona EV: llega al parénquima renal y es segura en el embarazo.'},
+  ok:{amoxiclav:'Amoxi-clavulánico: opción si es sensible, una vez que baja la fiebre.'},
+  nul:{nitro:'La nitrofurantoína solo concentra en orina: no llega al riñón. Sirve para cistitis, nunca para pielonefritis.',cipro:'Las quinolonas se evitan en el embarazo (afectan el cartílago fetal).',tmp:'El TMP-SMX se evita en el embarazo: el TMP es antifolato y la sulfa, cerca del término, desplaza la bilirrubina (kernicterus).'}},
+ {cuadro:'Meningitis neonatal',sint:'Un recién nacido frío, quieto, con la fontanela tensa como un tambor.',
+  pistas:{interrogatorio:['Recién nacido de 5 días, prematuro de 33 semanas.','Rotura prematura de membranas de 24 horas antes del parto.','La madre tuvo fiebre intraparto.','Evolución: rechazo del alimento, hipotermia y una convulsión.'],
+   examen:['Fontanela anterior abombada, letargo e hipotonía.','Distensión abdominal leve, ictericia.'],
+   lab:['LCR: bacilos Gram −, glucorraquia baja, PMN.','Cultivo: lactosa +, indol +, oxidasa −.','Antígeno capsular K1 (ácido polisiálico, parecido a tejido neural del neonato): la cápsula que la hace neurotropa.']},
+  clave:'Prematuro + rotura prolongada de membranas + meningitis + bacilo Gram − lactosa + con cápsula K1 = E. coli K1',
+  diferenciales:{sagal:'S. agalactiae, la primera causa de meningitis neonatal, es coco Gram + en cadena.',listeria:'Listeria es bacilo Gram + corto con movilidad.',kleb:'Klebsiella es inmóvil, indol − y de colonias muy mucosas.'},
+  best:{ceftri:'Cefalosporina de 3.ª: en el neonato se usa CEFOTAXIMA (la ceftriaxona desplaza la bilirrubina), misma familia y misma llegada al LCR.'},
+  ok:{genta:'Gentamicina: se usa en el esquema empírico del neonato junto a la ampicilina.'},
+  nul:{nitro:'La nitrofurantoína solo concentra en orina: no sirve en meningitis.'}}]},
+
+eceh:{c0:'Colitis hemorrágica en nene',v:[
+ {cuadro:'Síndrome urémico hemolítico',sint:'Una nena pálida como la cera, hinchada, que ya no hace pis.',
+  pistas:{interrogatorio:['Nena de 4 años.','Hace una semana visitó una granja educativa y tocó terneros.','Tuvo diarrea con sangre que ya mejoró; nunca tuvo fiebre.','Evolución: 2 días de palidez, edemas y orina escasa.'],
+   examen:['Palidez, petequias, edema palpebral e hipertensión arterial.','Oliguria; abdomen blando.'],
+   lab:['Frotis: ESQUISTOCITOS (anemia hemolítica microangiopática) y plaquetas bajas. Creatinina alta.','Coprocultivo en MacConkey-sorbitol: colonias SORBITOL − incoloras; aglutinan con antisuero O157.','PCR para stx2 +: toxina Shiga que daña el endotelio del glomérulo.']},
+  clave:'Granja con terneros + diarrea con sangre sin fiebre + anemia con esquistocitos + plaquetopenia + falla renal + toxina Shiga = SUH',
+  diferenciales:{shigella:'S. dysenteriae tipo 1 también puede dar SUH, pero con fiebre alta y tenesmo; es lactosa − e inmóvil.',typhi:'la fiebre tifoidea da fiebre en escalera y roséola, no SUH.',cdiff:'C. difficile aparece tras antibióticos, en internados.',menin:'la meningococcemia da púrpura y CID con fiebre alta, no esquistocitos con falla renal aislada.'}},
+ {cuadro:'Brote en un geriátrico',sint:'Una abuela que deja un reguero de sangre por el pasillo del geriátrico.',
+  pistas:{interrogatorio:['Mujer de 81 años, vive en un geriátrico.','Otros 6 residentes tienen diarrea con sangre desde el fin de semana.','El sábado les sirvieron ensalada de brotes crudos.','Evolución: 2 días de cólicos intensos y diarrea con sangre, sin fiebre.'],
+   examen:['Abdomen doloroso en flanco y fosa ilíaca derechos; sin fiebre.','Sin petequias; diuresis conservada.'],
+   lab:['Copro en fresco: hematíes, pocos leucocitos.','MacConkey-sorbitol: colonias sorbitol −; aglutinación O157:H7.','Toxina Shiga en heces por enzimoinmunoensayo.']},
+  clave:'Brote por alimento crudo + diarrea con sangre SIN fiebre + sorbitol − + toxina Shiga = E. coli O157:H7',
+  diferenciales:{shigella:'Shigella da fiebre alta, tenesmo y muchos leucocitos en heces.',cdiff:'C. difficile aparece tras antibióticos, con pseudomembranas.',vibrio:'el cólera da diarrea acuosa en agua de arroz, sin sangre.'}}]},
+
+kleb:{c0:'Neumonía en alcohólico',v:[
+ {cuadro:'Absceso hepático hipervirulento',sint:'Con la panza dura del lado derecho y un ojo lleno de pus.',
+  pistas:{interrogatorio:['Hombre de 52 años, diabético.','Nació en Taiwán y vive en Argentina hace 10 años.','No viajó ni tuvo cirugías abdominales.','Evolución: 10 días de fiebre y dolor en hipocondrio derecho; hoy ve borroso de un ojo.'],
+   examen:['Hepatomegalia dolorosa.','Ojo rojo con hipopion: endoftalmitis por siembra hematógena.'],
+   lab:['Punción del absceso: bacilos Gram − con cápsula gruesa.','Cultivo: colonias MUY mucosas; prueba del hilo + (se estiran más de 5 mm): hipermucoviscosa.','Lactosa +, inmóvil, ureasa +; serotipo capsular K1.']},
+  clave:'Diabético asiático + absceso hepático + endoftalmitis + Gram − capsulado con prueba del hilo + = Klebsiella hipervirulenta',
+  diferenciales:{ecoli:'E. coli es móvil e indol +, y no es hipermucoviscosa.',bfrag:'un absceso por anaerobios huele fétido y el germen es pleomórfico y crece en bilis.',pseudo:'Pseudomonas es no fermentador oxidasa +.'}},
+ {cuadro:'ITU por sonda con BLEE',sint:'Arrastra la bolsa de la sonda llena de orina turbia y se ríe de la ceftriaxona.',
+  pistas:{interrogatorio:['Hombre de 74 años, internado hace 3 semanas.','Tiene sonda vesical desde la internación.','Recibió ceftriaxona dos veces este mes.','Evolución: 2 días de fiebre y escalofríos pese a la ceftriaxona.'],
+   examen:['Orina turbia en la bolsa; dolor suprapúbico.','Sin otro foco: pulmones limpios.'],
+   lab:['Gram de orina: bacilos Gram − capsulados.','Cultivo: lactosa +, inmóvil, colonias mucosas.','Antibiograma: resistente a cefalosporinas de 3.ª y 4.ª; sinergia con clavulánico (efecto huevo): BLEE. Sensible a meropenem.']},
+  clave:'Internado + sonda + cefalosporinas previas + Klebsiella con efecto huevo + sensible a carbapenem = BLEE',
+  diferenciales:{kpc:'la KPC resiste también al meropenem; esta cepa es sensible a carbapenémicos (BLEE, no carbapenemasa).',ecoli:'E. coli es móvil e indol +.',entero:'Enterococcus es coco Gram + catalasa −.',pseudo:'Pseudomonas es no fermentador oxidasa +.'},
+  best:{mero:'Meropenem: el carbapenem resiste a las BLEE. Elección en infección grave.'},
+  ok:{genta:'Gentamicina: suele conservar actividad en orina.'},
+  res:{ceftri:'BLEE (tipo CTX-M): hidroliza las cefalosporinas de 3.ª generación.',ceftaz:'La BLEE también hidroliza ceftazidima y cefepime.',cefa1:'La BLEE destruye las cefalosporinas de 1.ª.',amoxiclav:'El clavulánico inhibe la BLEE in vitro, pero con mucho inóculo no alcanza: no es confiable.'}}]},
+
+pseudo:{c0:'Gran quemado',v:[
+ {cuadro:'Neumonía asociada al respirador',sint:'Intubado, con el tubo chorreando secreción verde que huele a uva.',
+  pistas:{interrogatorio:['Hombre de 66 años, 9 días en asistencia respiratoria mecánica.','Operado de urgencia del abdomen; recibió ceftriaxona.','La neumonía aparece después de las 48 horas de internación: nosocomial tardía.','Evolución: 2 días de fiebre, más secreciones y peor oxigenación.'],
+   examen:['Crepitantes en la base derecha y secreción purulenta verdosa por el tubo.','Desaturación con FiO₂ en aumento.'],
+   lab:['Aspirado traqueal: más de 10⁶ UFC/ml de bacilos Gram −.','Cultivo: no fermentador, OXIDASA +, pigmento azul-verdoso (piocianina), olor a uva, crece a 42 °C.','Antibiograma: resistente a ceftriaxona, sensible a ceftazidima.']},
+  clave:'ARM más de 5 días + secreción verde + no fermentador oxidasa + con piocianina = neumonía nosocomial tardía por Pseudomonas',
+  diferenciales:{kpc:'la KPC es una enterobacteria fermentadora y oxidasa −.',kleb:'Klebsiella fermenta la lactosa y es oxidasa −.',samr:'el SAMR es coco Gram + en racimo.',legio:'Legionella casi no se ve con Gram y necesita BCYE.'}},
+ {cuadro:'Otitis externa maligna',sint:'Le cuelga media cara y le supura el oído día y noche.',
+  pistas:{interrogatorio:['Hombre de 75 años, diabético mal controlado.','Se limpia los oídos con hisopos.','No tuvo otitis media ni resfrío.','Evolución: 3 semanas de dolor de oído que empeora de noche, y otorrea.'],
+   examen:['Tejido de granulación en el piso del conducto auditivo externo, otorrea verdosa.','Parálisis facial periférica del mismo lado: la infección llegó al hueso temporal.'],
+   lab:['Gram de la secreción: bacilos Gram −.','Cultivo: no fermentador, oxidasa +, pigmento verde.','TC: osteomielitis de la base del cráneo.']},
+  clave:'Anciano diabético + otalgia nocturna + granulación en el conducto + parálisis facial + no fermentador oxidasa + = otitis externa maligna',
+  diferenciales:{asper:'la otomicosis por Aspergillus da otitis externa con «algodón» y puntos negros, sin osteomielitis.',mucor:'la mucormicosis da escara negra en paladar o cornetes en la cetoacidosis.',spneu:'el neumococo da otitis MEDIA con tímpano abombado.'},
+  best:{ceftaz:'Ceftazidima EV: antipseudomónica, para arrancar.',cipro:'Ciprofloxacina: la única antipseudomónica oral; permite completar las semanas de tratamiento del hueso.'}}]},
+
+menin:{c0:'Meningitis en conscripto',v:[
+ {cuadro:'Meningococcemia fulminante',sint:'Manchas violetas que crecen mientras lo mirás, y las manos heladas.',
+  pistas:{interrogatorio:['Nena de 6 años, previamente sana.','No tiene la vacuna antimeningocócica.','Un compañero del colegio estuvo internado ayer.','Evolución: 10 horas de fiebre y decaimiento; las manchas aparecieron hace 2 horas.'],
+   examen:['Púrpura que NO se blanquea a la vitropresión, extremidades frías y TA 70/30.','Sin rigidez de nuca: la sepsis va por delante de la meningitis.'],
+   lab:['Raspado de una petequia y hemocultivo: diplococos Gram − en «granos de café».','Cultivo: oxidasa +, fermenta glucosa y MALTOSA.','Plaquetas bajas, TP prolongado (CID) y cortisol bajo: hemorragia suprarrenal (Waterhouse-Friderichsen).']},
+  clave:'Contacto con un caso + púrpura que no se borra + shock + CID + diplococo Gram − que fermenta maltosa = meningococcemia',
+  diferenciales:{spneu:'el neumococo puede dar púrpura en esplenectomizados, pero es diplococo Gram + lanceolado.',hib:'H. influenzae es cocobacilo Gram −.',saureus:'el shock tóxico estafilocócico da eritrodermia difusa, no púrpura.',gono:'el gonococo fermenta solo glucosa y da pocas pústulas con artritis.'}},
+ {cuadro:'Meningitis recurrente por déficit de complemento',sint:'Ya se transformó tres veces y siempre vuelve con la nuca dura.',
+  pistas:{interrogatorio:['Mujer de 24 años.','Es su tercera meningitis en 5 años; un hermano tuvo dos.','No tuvo traumatismos de cráneo ni cirugías.','Evolución: 18 horas de fiebre, cefalea y vómitos.'],
+   examen:['Rigidez de nuca y fotofobia.','Algunas petequias en el tronco.'],
+   lab:['LCR: diplococos Gram − intra y extracelulares, PMN, glucosa baja.','Cultivo: oxidasa +, fermenta glucosa y maltosa; serogrupo Y.','CH50 indetectable: déficit de C5-C9 (no se arma el complejo de ataque de membrana).']},
+  clave:'Meningitis a repetición + familiar afectado + CH50 nulo + diplococo Gram − maltosa + = meningococo por déficit de C5-C9',
+  diferenciales:{spneu:'las meningitis recurrentes por neumococo hacen pensar en una fístula de LCR; además es diplococo Gram +.',gono:'el gonococo fermenta solo glucosa y no suele dar meningitis.',listeria:'Listeria es cocobacilo Gram + en inmunodeprimidos.'}}]},
+
+gono:{c0:'Uretritis',v:[
+ {cuadro:'Gonococcemia: artritis-dermatitis',sint:'Rengo de una rodilla, con la muñeca hinchada y unas pocas pústulas con sangre.',
+  pistas:{interrogatorio:['Mujer de 22 años.','Tiene una pareja nueva desde hace un mes; no usan preservativo.','El cuadro empezó durante la menstruación.','Evolución: 4 días de dolor articular que salta de una articulación a otra, con fiebre.'],
+   examen:['Tenosinovitis de los extensores de la muñeca y artritis de rodilla.','Escasas pústulas hemorrágicas en manos y pies.'],
+   lab:['Líquido articular: diplococos Gram − escasos dentro de PMN.','Cultivo en Thayer-Martin con CO₂: oxidasa +, fermenta SOLO glucosa (no maltosa).','NAAT del cuello uterino +.']},
+  clave:'Mujer joven + menstruación + poliartralgia migratoria + tenosinovitis + pústulas hemorrágicas + diplococo Gram − que no fermenta maltosa',
+  diferenciales:{menin:'el meningococo fermenta glucosa Y maltosa.',chlam:'la artritis reactiva por Chlamydia no tiene pústulas ni gérmenes en el líquido.',trepo:'la sífilis secundaria da rash palmo-plantar sin artritis séptica.',saureus:'la artritis séptica estafilocócica es monoarticular, con racimos, sin pústulas.'}},
+ {cuadro:'Oftalmía neonatal',sint:'Un recién nacido con los párpados hinchados que chorrean pus amarillo.',
+  pistas:{interrogatorio:['Recién nacido de 3 días.','La madre no tuvo controles prenatales.','No recibió profilaxis ocular al nacer.','Evolución: desde ayer, secreción ocular abundante en ambos ojos.'],
+   examen:['Conjuntivitis purulenta bilateral muy copiosa con edema palpebral.','Riesgo de úlcera y perforación corneal.'],
+   lab:['Gram de la secreción: diplococos Gram − dentro de PMN.','Thayer-Martin: oxidasa +, fermenta solo glucosa.','NAAT de la madre +.']},
+  clave:'Recién nacido sin profilaxis + conjuntivitis purulenta copiosa en los primeros días + diplococos Gram − intracelulares',
+  diferenciales:{chlam:'la conjuntivitis por Chlamydia aparece a los 5-14 días, es menos purulenta y no se ve con Gram.',pseudo:'Pseudomonas es bacilo Gram − no fermentador.',saureus:'S. aureus forma racimos Gram +.'},
+  best:{ceftri:'Ceftriaxona en dosis única IM o EV + lavado ocular.'}}]},
+
+hib:{c0:'Epiglotitis',v:[
+ {cuadro:'Meningitis en lactante no vacunado',sint:'Un bebé que llora más fuerte cuando lo alzás, con la fontanela abombada.',
+  pistas:{interrogatorio:['Lactante de 9 meses.','No tiene ninguna vacuna.','Va a la guardería; tuvo otitis el mes pasado.','Evolución: 24 horas de fiebre, vómitos y una convulsión.'],
+   examen:['Fontanela abombada, rigidez de nuca, irritabilidad paradójica.','Sin petequias.'],
+   lab:['LCR: cocobacilos Gram − pleomórficos, PMN, glucosa baja.','Crece solo en agar chocolate (necesita factor X hemina y V NAD); satelitismo alrededor de S. aureus en agar sangre.','Antígeno capsular PRP en LCR +. Productor de β-lactamasa.']},
+  clave:'Lactante sin vacunas + meningitis + cocobacilo Gram − que necesita X y V + antígeno PRP = Hib',
+  diferenciales:{menin:'el meningococo es diplococo Gram − y no necesita factores X y V.',spneu:'el neumococo es diplococo Gram + lanceolado.',listeria:'Listeria es Gram + y afecta a neonatos.',ecoli:'E. coli K1 afecta al neonato y crece en MacConkey.'}},
+ {cuadro:'Celulitis bucal violácea',sint:'Un bebé con la mejilla hinchada y de color azul violeta.',
+  pistas:{interrogatorio:['Lactante de 11 meses.','No completó el calendario de vacunas.','Tuvo otitis media del mismo lado.','Evolución: 1 día de fiebre alta y la mejilla que se pone violeta.'],
+   examen:['Celulitis de la mejilla, de color azul-violáceo, caliente y dura.','Fiebre de 39,5 °C, irritable.'],
+   lab:['Hemocultivo: cocobacilos Gram −.','Cultivo en agar chocolate; requiere X y V.','Aglutinación capsular tipo b.']},
+  clave:'Lactante no vacunado + celulitis bucal azul-violácea + bacteriemia por cocobacilo Gram − X y V dependiente = Hib',
+  diferenciales:{spyo:'la celulitis estreptocócica es roja y no violácea, con cocos en cadena.',saureus:'S. aureus da pus y forma racimos.',spneu:'el neumococo es diplococo Gram +.'}}]},
+
+typhi:{c0:'Fiebre tifoidea en viajero',v:[
+ {cuadro:'Perforación intestinal en la 3.ª semana',sint:'Tres semanas ardiendo de fiebre y ahora la panza se le pone dura como una tabla.',
+  pistas:{interrogatorio:['Hombre de 25 años.','Volvió de un viaje a la India hace un mes.','Nunca se trató la fiebre: «pensó que era gripe».','Evolución: 3 semanas de fiebre; hoy, dolor abdominal súbito.'],
+   examen:['Abdomen en tabla con rebote positivo: peritonitis. Bradicardia relativa.','Hepatoesplenomegalia y roséola en el tronco.'],
+   lab:['En la 3.ª semana el hemocultivo ya rinde poco; coprocultivo y urocultivo positivos.','Bacilo Gram − móvil, lactosa −, H₂S + (colonias con centro negro en SS).','Antígeno Vi capsular. Rx: neumoperitoneo por úlcera perforada de las placas de Peyer.']},
+  clave:'Viajero + fiebre de 3 semanas + bradicardia relativa + perforación ileal + bacilo lactosa − H₂S + con antígeno Vi',
+  diferenciales:{shigella:'Shigella da disentería aguda, no fiebre de 3 semanas; es inmóvil y H₂S −.',bfrag:'la peritonitis por perforación de colon es mixta con anaerobios, sin fiebre previa de semanas.',lepto:'la leptospirosis da sufusión conjuntival y mialgias tras agua contaminada.',brucella:'Brucella da fiebre ondulante tras leche cruda, no perforación.'}},
+ {cuadro:'Portadora crónica',sint:'Parece sana, pero deja huellas de bacilos en cada plato que sirve.',
+  pistas:{interrogatorio:['Mujer de 50 años, cocinera de un comedor.','Tiene cálculos en la vesícula.','Ocho comensales tuvieron fiebre prolongada en los últimos meses.','Evolución: ella está asintomática; tuvo una «fiebre larga» hace años.'],
+   examen:['Asintomática; dolor leve en hipocondrio derecho al palpar.','Sin fiebre, sin roséola.'],
+   lab:['Coprocultivo positivo persistente por más de un año.','Bacilo Gram − móvil, lactosa −, H₂S +.','Anticuerpos anti-Vi altos (marcador de portador). Eco: litiasis vesicular, el reservorio.']},
+  clave:'Cocinera + brotes en comensales + litiasis vesicular + coprocultivo positivo por más de un año + anti-Vi = portadora crónica de S. Typhi',
+  diferenciales:{shigella:'Shigella no deja portadores crónicos en la vesícula y es H₂S −.',hpylori:'H. pylori vive en el estómago y no da fiebre a los comensales.',ecoli:'E. coli fermenta lactosa.'},
+  best:{cipro:'Ciprofloxacina 4 a 6 semanas: se concentra en la bilis. Si hay cálculos, se suma la colecistectomía.'},
+  ok:{ceftri:'Ceftriaxona: sirve, pero la erradicación del portador se hace con quinolona oral prolongada.'}}]},
+
+shigella:{c0:'Disentería en jardín',v:[
+ {cuadro:'Convulsión febril con disentería',sint:'Un nene que convulsiona ardiendo de fiebre y después deja un charco de sangre y moco.',
+  pistas:{interrogatorio:['Nene de 2 años.','En su casa no hay agua de red.','Su hermano tuvo diarrea la semana pasada.','Evolución: tuvo una convulsión con 40 °C; horas después, deposiciones con sangre.'],
+   examen:['Fiebre de 40 °C, sin signos meníngeos.','Dolor abdominal, tenesmo y deshidratación leve.'],
+   lab:['Copro en fresco: más de 20 leucocitos por campo y hematíes (diarrea inflamatoria).','Agar SS/XLD: colonias lactosa −, H₂S − (sin centro negro); inmóvil.','Aglutinación: serogrupo D (S. sonnei).']},
+  clave:'Nene + convulsión febril + disentería con muchos leucocitos + bacilo lactosa − H₂S − inmóvil = Shigella',
+  diferenciales:{typhi:'S. Typhi es móvil y H₂S +.',eceh:'la ECEH da sangre SIN fiebre, y es sorbitol −.',menin:'la meningitis da rigidez de nuca, y el LCR mostraría diplococos.',vibrio:'el cólera da diarrea acuosa sin leucocitos.'}},
+ {cuadro:'Disentería del viajero',sint:'Volvió de vacaciones corriendo al baño cada media hora, con calambres que lo doblan.',
+  pistas:{interrogatorio:['Hombre de 30 años.','Volvió hace 3 días de un viaje por el sudeste asiático.','Comió en puestos callejeros y tomó agua sin embotellar.','Evolución: 2 días de fiebre, cólicos, tenesmo y 12 deposiciones con sangre y moco.'],
+   examen:['Fiebre de 38,8 °C, dolor en marco colónico.','Tenesmo rectal; deshidratación moderada.'],
+   lab:['Copro: leucocitos abundantes (diarrea invasiva de colon).','Cultivo: lactosa −, H₂S −, inmóvil; serogrupo B (S. flexneri).','Dosis infectante de apenas 10 a 100 bacterias: resiste el ácido gástrico.']},
+  clave:'Viajero + disentería febril con tenesmo + leucocitos abundantes + bacilo inmóvil lactosa − H₂S − = Shigella',
+  diferenciales:{eceh:'la ECEH no da fiebre y es sorbitol −.',vibrio:'el cólera da diarrea acuosa sin sangre ni fiebre.',typhi:'S. Typhi da fiebre prolongada sin disentería al comienzo.',cdiff:'C. difficile aparece tras antibióticos.'}}]},
+
+vibrio:{c0:'Cólera',v:[
+ {cuadro:'Cólera en embarazada',sint:'Una embarazada hundida, con los ojos secos, rodeada de un lago blanco.',
+  pistas:{interrogatorio:['Mujer de 27 años, embarazada de 24 semanas.','Vive en un campamento después de una inundación.','Toman agua de un pozo compartido.','Evolución: 10 horas de diarrea abundante sin fiebre ni dolor.'],
+   examen:['Signo del pliegue, mucosas secas, ojos hundidos, TA 85/50.','Deposiciones en «agua de arroz» con olor a pescado.'],
+   lab:['Fresco en campo oscuro: bacilos curvos con movilidad en «estrella fugaz».','TCBS: colonias AMARILLAS (fermenta sacarosa); oxidasa +.','Aglutinación con antisuero O1.']},
+  clave:'Embarazada + agua de pozo tras inundación + diarrea en agua de arroz + TCBS amarillo + O1 = cólera',
+  diferenciales:{eceh:'la ECEH da diarrea con sangre.',shigella:'Shigella da disentería febril con leucocitos.',cdiff:'C. difficile aparece tras antibióticos.'},
+  ok:{macro:'Azitromicina en dosis única: el antibiótico de elección en la embarazada (acorta la diarrea, pero lo que salva es rehidratar).'},
+  nul:{doxi:'Doxiciclina contraindicada en el embarazo: se deposita en hueso y dientes del feto.',cipro:'Las quinolonas se evitan en el embarazo.'}},
+ {cuadro:'Cólera en viajero',sint:'Un mochilero arrugado como una pasa que no para de evacuar agua.',
+  pistas:{interrogatorio:['Hombre de 33 años.','Volvió de Haití hace 2 días, donde trabajó como voluntario.','Comió mariscos crudos.','Evolución: 1 día de diarrea profusa, calambres musculares y vómitos.'],
+   examen:['Deshidratación grave: pulso débil, oliguria.','Calambres por hipopotasemia; sin fiebre.'],
+   lab:['Fresco: bacilos curvos muy móviles.','TCBS: colonias amarillas; oxidasa +.','Toxina colérica: activa la adenilato ciclasa (sube el AMPc) y el enterocito secreta cloro y agua.']},
+  clave:'Viajero de zona endémica + diarrea profusa sin fiebre + calambres + bacilo curvo oxidasa + en TCBS amarillo',
+  diferenciales:{eceh:'la ECEH da diarrea con sangre.',shigella:'Shigella da disentería febril.',pseudo:'Pseudomonas es oxidasa + pero no fermentador y no da diarrea.'}}]},
+
+legio:{c0:'Neumonía grave en fumador',v:[
+ {cuadro:'Fiebre de Pontiac',sint:'Un oficinista con fiebre y dolor de cuerpo, empapado por las gotas del aire acondicionado.',
+  pistas:{interrogatorio:['Hombre de 40 años, sano.','Trabaja en una oficina; hace 2 días hicieron mantenimiento de la torre de enfriamiento.','La mitad de sus compañeros está igual.','Evolución: 36 horas de fiebre, mialgias y cefalea; sin tos importante.'],
+   examen:['Fiebre de 38,5 °C, mialgias; auscultación normal.','Rx de tórax normal: no hay neumonía.'],
+   lab:['Gram de esputo: no se ve nada.','El agua de la torre crece en agar BCYE (necesita cisteína y hierro).','Antígeno urinario de L. pneumophila serogrupo 1 +.']},
+  clave:'Brote en oficina + torre de enfriamiento + cuadro gripal SIN neumonía + antígeno urinario + = fiebre de Pontiac',
+  diferenciales:{myco:'Mycoplasma da neumonía caminante con tos seca de semanas.',spneu:'el neumococo da neumonía lobar con esputo herrumbroso.',psittaci:'la psitacosis aparece tras contacto con aves y da neumonía.'},
+  best:{sosten:'La fiebre de Pontiac se cura sola en 2 a 5 días: sostén, sin antibiótico.'},
+  ok:{macro:'Funcionaría, pero no hace falta: no hay neumonía.'}},
+ {cuadro:'Legionelosis nosocomial en trasplantado',sint:'Un trasplantado confundido, con diarrea y la piel mojada por la ducha del hospital.',
+  pistas:{interrogatorio:['Hombre de 60 años, trasplantado renal hace 4 meses; toma tacrolimus.','Está internado hace 8 días; se ducha con el agua caliente del hospital.','No hubo aspiración ni ARM.','Evolución: 2 días de fiebre alta, tos y diarrea; hoy está confuso.'],
+   examen:['Crepitantes bilaterales, confusión.','Bradicardia relativa.'],
+   lab:['Gram: casi no se tiñe; Giemsa de BAL con bacilos intracelulares.','Cultivo en BCYE a los 4 días; el agua de las duchas también crece.','Antígeno urinario +; sodio de 126 mEq/l.']},
+  clave:'Trasplantado + agua caliente del hospital + neumonía con diarrea, confusión e hiponatremia + BCYE + = Legionella nosocomial',
+  diferenciales:{pseudo:'Pseudomonas da neumonía nosocomial en ventilados, con Gram − no fermentador visible.',spneu:'el neumococo se ve bien con Gram.',pjiro:'Pneumocystis da hipoxemia con vidrio esmerilado y Grocott +.',kleb:'Klebsiella se ve con Gram y crece en medios comunes.'},
+  best:{cipro:'Levofloxacina: elección en el trasplantado, porque la claritromicina inhibe el CYP3A4 y dispara los niveles de tacrolimus.'},
+  ok:{macro:'La azitromicina sirve, pero hay que vigilar interacciones con el tacrolimus.'}}]},
+
+hpylori:{c0:'Úlcera duodenal',v:[
+ {cuadro:'Linfoma MALT gástrico',sint:'Un hombre flaco con una masa gástrica que brilla, rodeado de espirales.',
+  pistas:{interrogatorio:['Hombre de 60 años.','Dispepsia de años que trató solo con antiácidos.','Se crió en una casa con muchos hermanos y sin agua de red.','Evolución: 4 meses de saciedad precoz y pérdida de 6 kilos.'],
+   examen:['Dolor epigástrico leve; sin adenopatías palpables.','Palidez; sin ictericia.'],
+   lab:['Biopsia: linfoma MALT de bajo grado con bacilos curvos en el moco.','Test rápido de ureasa de la biopsia +.','Test del aliento con urea marcada +.']},
+  clave:'Dispepsia crónica + linfoma MALT de bajo grado + bacilos espiralados ureasa + = H. pylori (erradicarlo puede curar el linfoma)',
+  diferenciales:{tbc:'la TBC digestiva da pérdida de peso con tos y BAAR, no linfoma MALT.',shigella:'Shigella da disentería aguda.',cdiff:'C. difficile da colitis tras antibióticos.'}},
+ {cuadro:'Anemia ferropénica refractaria',sint:'Una adolescente pálida que no mejora con hierro, con un espiral girando en el estómago.',
+  pistas:{interrogatorio:['Mujer de 16 años.','Toma hierro oral hace 6 meses y la anemia no se corrige.','Su madre tuvo una úlcera gástrica.','Evolución: cansancio de meses y dolor epigástrico ocasional.'],
+   examen:['Palidez de piel y mucosas, uñas quebradizas.','Sin sangrado ginecológico abundante.'],
+   lab:['Ferritina baja; sangre oculta en materia fecal negativa.','Antígeno de H. pylori en materia fecal +.','Endoscopía: gastritis antral nodular; ureasa de la biopsia +.']},
+  clave:'Anemia ferropénica que no responde al hierro + gastritis antral + antígeno fecal y ureasa + = H. pylori',
+  diferenciales:{vibrio:'el cólera da diarrea acuosa aguda.',cdiff:'C. difficile da diarrea tras antibióticos.',shigella:'Shigella da disentería.'}}]},
+
+kpc:{c0:'Neumonía en terapia intensiva prolongada',v:[
+ {cuadro:'Infección de sitio quirúrgico post-trasplante hepático',sint:'Una herida enorme en el abdomen que supura y se burla del meropenem.',
+  pistas:{interrogatorio:['Hombre de 49 años, trasplantado de hígado hace 3 semanas.','Recibió meropenem y vancomicina en la UTI.','Estuvo colonizado por Klebsiella en el hisopado rectal.','Evolución: 3 días de fiebre y salida de pus por la herida.'],
+   examen:['Herida con dehiscencia y pus espeso.','Taquicardia, TA en descenso.'],
+   lab:['Gram del pus: bacilos Gram − capsulados.','Cultivo: Klebsiella resistente a meropenem; test de ácido borónico + (carbapenemasa de clase A).','PCR blaKPC +. Sensible a colistina.']},
+  clave:'Trasplantado + carbapenémicos previos + colonización rectal + Klebsiella con ácido borónico + = KPC',
+  diferenciales:{kleb:'la Klebsiella común (o BLEE) es sensible al meropenem.',pseudo:'Pseudomonas es no fermentador oxidasa +.',samr:'el SAMR es coco Gram +.',ecoli:'E. coli es móvil e indol +.'}},
+ {cuadro:'Bacteriemia en hemodializado',sint:'Conectado a una máquina de diálisis que bombea Klebsiella a la sangre.',
+  pistas:{interrogatorio:['Mujer de 67 años en hemodiálisis por catéter desde hace 8 meses.','Estuvo internada dos veces este año con carbapenémicos.','Vive en un geriátrico con brote de KPC.','Evolución: escalofríos y fiebre que empiezan al conectarla.'],
+   examen:['Orificio del catéter con eritema.','Hipotensión durante la diálisis.'],
+   lab:['Hemocultivos (catéter y periférico): bacilos Gram − capsulados; el del catéter se positiviza 2 horas antes.','Resistente a todos los betalactámicos y a ciprofloxacina.','Ácido borónico +, PCR blaKPC +.']},
+  clave:'Catéter de diálisis + tiempo diferencial a favor del catéter + Klebsiella con ácido borónico + = bacteriemia por KPC',
+  diferenciales:{kleb:'la Klebsiella sensible responde a la ceftriaxona.',samr:'el SAMR es la causa clásica de bacteriemia por catéter, pero es coco Gram +.',ckru:'Candida da fungemia por catéter con levaduras.',pseudo:'Pseudomonas es no fermentador.'}}]},
+
+/* ---------- PISO 3 ---------- */
+tetani:{c0:'Herida punzante en jardinero',v:[
+ {cuadro:'Tétanos neonatal',sint:'Un recién nacido arqueado hacia atrás que no puede abrir la boca para mamar.',
+  pistas:{interrogatorio:['Recién nacido de 7 días.','Nació en la casa; cortaron el cordón con una tijera de jardín.','La madre nunca recibió la vacuna antitetánica: el bebé no tiene anticuerpos maternos.','Evolución: 2 días; dejó de succionar y tiene espasmos cuando lo tocan.'],
+   examen:['Trismus (no puede succionar), espasmos generalizados y opistótonos al estímulo.','Muñón umbilical sucio y con mal olor.'],
+   lab:['Gram del muñón: bacilos Gram + con espora terminal «en palillo de tambor».','Cultivo anaerobio estricto: crecimiento en velo (swarming); positivo solo en un tercio de los casos.','El diagnóstico es clínico: la tetanospasmina bloquea la liberación de GABA y glicina en las interneuronas inhibitorias.']},
+  clave:'Parto domiciliario + cordón con instrumento sucio + madre sin vacuna + trismus y opistótonos = tétanos neonatal',
+  diferenciales:{botu:'el botulismo da parálisis FLÁCIDA, no espasmos.',menin:'la meningitis neonatal da fontanela abombada y fiebre, sin trismus.',sagal:'la sepsis por S. agalactiae da hipotonía y quejido, no rigidez.'}},
+ {cuadro:'Tétanos en usuario de drogas',sint:'Una sonrisa forzada que no se borra y la espalda que se le dobla hacia atrás.',
+  pistas:{interrogatorio:['Hombre de 38 años.','Se inyecta heroína por vía subcutánea («skin popping»).','No recibe refuerzos de vacuna desde la escuela.','Evolución: 4 días; empezó con dificultad para abrir la boca.'],
+   examen:['Trismus, risa sardónica y rigidez de nuca; conciencia lúcida.','Absceso subcutáneo en el antebrazo, en el sitio de inyección.'],
+   lab:['Gram del absceso: bacilos Gram + con espora terminal.','Cultivo anaerobio: C. tetani junto a otros gérmenes.','Diagnóstico clínico: la toxina viaja retrógrada por el axón hasta la médula.']},
+  clave:'Inyección subcutánea de drogas + sin refuerzos + trismus + risa sardónica con conciencia lúcida = tétanos',
+  diferenciales:{botu:'el botulismo por herida también aparece en usuarios de drogas, pero da parálisis flácida descendente.',menin:'la meningitis da fiebre y alteración de la conciencia.',perfri:'C. perfringens da gangrena con crepitación, no espasmos.'}}]},
+
+botu:{c0:'Conserva casera',v:[
+ {cuadro:'Botulismo del lactante',sint:'Un bebé blando como un trapo, con los párpados caídos y un frasco de miel.',
+  pistas:{interrogatorio:['Lactante de 4 meses.','Le endulzan el chupete con miel y le dan té de yuyos.','En su intestino inmaduro todavía no hay flora que compita.','Evolución: una semana de constipación, succión y llanto cada vez más débiles.'],
+   examen:['Hipotonía generalizada («bebé de trapo»), ptosis y reflejo pupilar lento.','Afebril y despierto.'],
+   lab:['Toxina botulínica en materia fecal (bioensayo en ratón).','Cultivo anaerobio de heces: C. botulinum. Las esporas germinaron en el intestino.','Gram: bacilos Gram + con espora subterminal.']},
+  clave:'Lactante + miel + constipación + hipotonía con ptosis + toxina en heces = botulismo del lactante',
+  diferenciales:{tetani:'el tétanos da rigidez y espasmos, no flacidez.',listeria:'la listeriosis neonatal da fiebre y sepsis.',difteria:'la difteria da membrana faríngea antes de la parálisis.'},
+  best:{antitox:'Inmunoglobulina botulínica humana: neutraliza la toxina libre. Es el tratamiento específico.'},
+  nul:{penG:'En el lactante NO se dan antibióticos: lisar las bacterias del intestino libera más toxina.'}},
+ {cuadro:'Botulismo por herida',sint:'Ve doble, no puede tragar y tiene un absceso negro en el brazo.',
+  pistas:{interrogatorio:['Hombre de 35 años.','Se inyecta heroína negra («black tar»).','No comió conservas caseras.','Evolución: 2 días de visión doble, dificultad para tragar y debilidad que baja.'],
+   examen:['Ptosis, midriasis, disfagia y parálisis flácida descendente simétrica.','Absceso en el sitio de inyección, sin fiebre.'],
+   lab:['Gram del absceso: bacilos Gram + con espora.','Cultivo anaerobio del absceso: C. botulinum.','Toxina botulínica en suero: bloquea la liberación de acetilcolina en la placa motora.']},
+  clave:'Heroína negra inyectada + absceso + parálisis flácida descendente con pares craneales + toxina en suero = botulismo por herida',
+  diferenciales:{tetani:'el tétanos da espasmos y trismus.',difteria:'la difteria da membrana faríngea y miocarditis.',myco:'Mycoplasma no da parálisis.'},
+  best:{antitox:'Antitoxina equina: neutraliza la toxina circulante.'},
+  ok:{penG:'Acá sí: penicilina + desbridamiento, porque la fábrica de toxina es la herida.'}}]},
+
+perfri:{c0:'Gangrena gaseosa',v:[
+ {cuadro:'Intoxicación alimentaria',sint:'Se agarra la panza a los retorcijones con un plato de guiso recalentado.',
+  pistas:{interrogatorio:['Hombre de 45 años.','Fue a un evento con catering: guiso de carne que se cocinó el día anterior y se recalentó.','Otros 20 invitados tienen lo mismo.','Evolución: empezó 10 horas después de comer: diarrea acuosa y cólicos, sin vómitos.'],
+   examen:['Dolor abdominal difuso, sin fiebre.','Hidratado; se resuelve en 24 horas.'],
+   lab:['En el guiso: más de 10⁵ bacterias por gramo; las esporas sobrevivieron a la cocción y germinaron al enfriar lento.','Cultivo anaerobio: doble halo de hemólisis; lecitinasa + (reacción de Nagler).','Enterotoxina CPE en heces: se libera al esporular en el intestino.']},
+  clave:'Brote + carne recalentada + diarrea acuosa con cólicos a las 8-12 horas sin fiebre + lecitinasa + = C. perfringens tipo A',
+  diferenciales:{saureus:'la toxina preformada de S. aureus da VÓMITOS a las 2-6 horas.',vibrio:'el cólera da diarrea profusa en agua de arroz.',eceh:'la ECEH da diarrea con sangre.',cdiff:'C. difficile aparece tras antibióticos.'},
+  best:{sosten:'Es autolimitada: rehidratación. No se dan antibióticos.'},
+  nul:{penG:'No hace falta: es una toxiinfección que se resuelve sola en un día.',clinda:'No hace falta: es autolimitada.'}},
+ {cuadro:'Aborto séptico con hemólisis',sint:'Amarilla, con la orina negra y el útero que cruje.',
+  pistas:{interrogatorio:['Mujer de 24 años.','Hace 2 días se hizo un aborto en condiciones inseguras.','No tiene enfermedades previas.','Evolución: 24 horas de fiebre, dolor pelviano y orina oscura.'],
+   examen:['Útero doloroso y crepitante; flujo fétido.','Ictericia, hipotensión y hemoglobinuria: hemólisis intravascular masiva.'],
+   lab:['Gram del exudado: bacilos Gram + grandes, rectangulares, sin esporas («en furgón»).','Cultivo anaerobio: doble halo de hemólisis.','Lecitinasa +: la toxina α destruye las membranas de los glóbulos rojos.']},
+  clave:'Aborto inseguro + útero crepitante + hemólisis masiva + bacilos Gram + grandes sin esporas con doble hemólisis',
+  diferenciales:{bfrag:'B. fragilis es un bacilo Gram − y no da hemólisis masiva.',spyo:'S. pyogenes da sepsis puerperal con cocos en cadena.',ecoli:'E. coli es bacilo Gram − aerobio facultativo.'}}]},
+
+cdiff:{c0:'Diarrea post-antibiótico',v:[
+ {cuadro:'Recurrencia',sint:'Volvió: la misma diarrea de hace un mes, con olor a establo.',
+  pistas:{interrogatorio:['Mujer de 70 años.','Hace 5 semanas tuvo colitis por C. difficile tratada con metronidazol.','Ahora recibió amoxicilina por una infección dental.','Evolución: 3 días de diarrea acuosa, 8 veces por día.'],
+   examen:['Dolor abdominal difuso, fiebre de 38 °C.','Sin signos de abdomen agudo.'],
+   lab:['Glutamato deshidrogenasa (GDH) + en heces.','Toxinas A y B + por enzimoinmunoensayo.','Las esporas sobrevivieron al tratamiento anterior: recurrencia.']},
+  clave:'Colitis por C. difficile reciente + nuevo antibiótico + diarrea + GDH y toxinas + = recurrencia',
+  diferenciales:{shigella:'Shigella da disentería con fiebre alta en la comunidad.',eceh:'la ECEH da sangre sin fiebre tras carne mal cocida.',perfri:'C. perfringens da una diarrea de un día tras comida recalentada.'},
+  best:{vanco:'Vancomicina ORAL en pauta descendente: no se absorbe y actúa en la luz del colon.'},
+  nul:{metro:'En la recurrencia no se repite metronidazol: responde peor y su neurotoxicidad es acumulativa.'}},
+ {cuadro:'Megacolon tóxico',sint:'La panza hinchada como un globo y, raro, ya no tiene diarrea.',
+  pistas:{interrogatorio:['Hombre de 78 años internado por neumonía.','Recibió ceftriaxona y clindamicina.','Tuvo diarrea los primeros días.','Evolución: hoy no evacúa, tiene fiebre y el abdomen distendido.'],
+   examen:['Distensión abdominal, ausencia de ruidos, dolor difuso.','Taquicardia, hipotensión.'],
+   lab:['Leucocitos de 40.000/mm³ y ácido láctico alto.','Toxinas A y B + (en materia fecal del rectal).','Rx: colon transverso de más de 6 cm. Colonoscopía (con cuidado): pseudomembranas.']},
+  clave:'Antibióticos + diarrea que se corta + distensión e íleo + leucocitosis extrema + toxinas + = megacolon tóxico por C. difficile',
+  diferenciales:{shigella:'Shigella rara vez da megacolon en un internado sin antibióticos.',bfrag:'la peritonitis por B. fragilis sigue a una perforación, no a antibióticos.',eceh:'la ECEH da sangre sin fiebre.'},
+  ok:{metro:'Metronidazol EV: se suma porque con íleo la vancomicina oral no llega bien (y se evalúa cirugía).'}}]},
+
+bfrag:{c0:'Absceso por perforación colónica',v:[
+ {cuadro:'Absceso tubo-ovárico',sint:'Una masa pelviana caliente que huele a podrido.',
+  pistas:{interrogatorio:['Mujer de 28 años.','Usa DIU hace 6 años.','Tuvo una uretritis en la pareja hace meses.','Evolución: 10 días de dolor pelviano y fiebre.'],
+   examen:['Masa anexial dolorosa; dolor a la movilización del cuello.','Flujo fétido.'],
+   lab:['Punción de la colección: pus fétido; Gram con bacilos Gram − pleomórficos y otras bacterias (mixta).','Cultivo anaerobio estricto: crece en bilis 20%.','Produce β-lactamasa: resistente a penicilina.']},
+  clave:'DIU + enfermedad pelviana + absceso fétido + bacilo Gram − anaerobio que crece en bilis = infección mixta con B. fragilis',
+  diferenciales:{gono:'el gonococo inicia la EPI, pero el absceso maduro es polimicrobiano con anaerobios.',chlam:'Chlamydia da EPI silenciosa, no un absceso fétido.',ecoli:'E. coli crece en aerobiosis y no da olor fétido.'}},
+ {cuadro:'Pie diabético con osteomielitis',sint:'Un pie negro y hediondo que supura hasta el hueso.',
+  pistas:{interrogatorio:['Hombre de 63 años, diabético con neuropatía.','Tiene una úlcera plantar hace 3 meses.','No siente dolor en el pie.','Evolución: una semana de supuración fétida y fiebre.'],
+   examen:['Úlcera profunda con hueso expuesto (sonda que toca hueso +), olor pútrido.','Crepitación leve por gas en los tejidos.'],
+   lab:['Biopsia ósea: flora mixta; bacilos Gram − pleomórficos.','Cultivo anaerobio: crece en bilis; además S. aureus y enterobacterias.','RM: osteomielitis del metatarsiano.']},
+  clave:'Pie diabético + úlcera profunda fétida + osteomielitis + anaerobio Gram − que crece en bilis = infección mixta con B. fragilis',
+  diferenciales:{perfri:'la gangrena gaseosa avanza en horas con bacilos Gram + grandes.',saureus:'S. aureus acompaña, pero no explica el olor fétido.',pseudo:'Pseudomonas da olor a uva y es aerobia.'}}]},
+
+trepo:{c0:'Sífilis primaria y secundaria',v:[
+ {cuadro:'Sífilis congénita',sint:'Un bebé con mocos sanguinolentos, la piel de las palmas pelándose y un hígado enorme.',
+  pistas:{interrogatorio:['Lactante de 3 semanas.','La madre tuvo una VDRL + en el embarazo y no se trató.','No hubo controles en el tercer trimestre.','Evolución: rinitis persistente («coriza sifilítica») y llanto al mover los brazos.'],
+   examen:['Hepatoesplenomegalia, pénfigo palmo-plantar y rinitis sanguinolenta.','Pseudoparálisis de Parrot (le duele mover los brazos por la osteocondritis).'],
+   lab:['Campo oscuro de la secreción nasal: espiroquetas móviles.','VDRL del bebé con títulos 4 veces mayores que la madre.','FTA-ABS IgM +. Rx: periostitis de huesos largos.']},
+  clave:'Madre con VDRL no tratada + coriza + pénfigo palmo-plantar + pseudoparálisis + espiroquetas en campo oscuro = sífilis congénita',
+  diferenciales:{listeria:'la listeriosis neonatal da sepsis con microabscesos, no periostitis.',lepto:'Leptospira no se transmite al feto así y da ictericia en adultos expuestos al agua.',sagal:'S. agalactiae da sepsis o meningitis, sin lesiones óseas ni cutáneas.'},
+  best:{penG:'Penicilina G cristalina EV 10 días: nunca se describió resistencia.'},
+  nul:{doxi:'Doxiciclina contraindicada en niños: se deposita en hueso y dientes.'}},
+ {cuadro:'Neurosífilis (tabes dorsal)',sint:'Camina dando golpes con los talones, mirando el piso, con las pupilas chiquitas.',
+  pistas:{interrogatorio:['Hombre de 62 años.','Tuvo una «llaga» en el pene a los 30 años que se curó sola.','Nunca se trató.','Evolución: 2 años de dolores lancinantes en las piernas y marcha inestable.'],
+   examen:['Marcha tabética, Romberg +, abolición de reflejos y de sensibilidad propioceptiva.','Pupilas de Argyll Robertson: acomodan pero no reaccionan a la luz.'],
+   lab:['No se ve con Gram: espiroqueta demasiado fina.','VDRL en LCR +, con pleocitosis linfocitaria.','FTA-ABS en suero +.']},
+  clave:'Chancro no tratado hace décadas + marcha tabética + Argyll Robertson + VDRL en LCR + = neurosífilis',
+  diferenciales:{tbc:'la meningitis TBC es subaguda, con fiebre y BAAR.',crypto:'Cryptococcus da meningitis subaguda en VIH con tinta china +.',lepto:'Leptospira da meningitis aséptica aguda tras agua contaminada.'},
+  best:{penG:'Penicilina G CRISTALINA EV: la benzatínica no alcanza niveles en el LCR.'},
+  ok:{ceftri:'Ceftriaxona EV: alternativa que llega al LCR.'}}]},
+
+lepto:{c0:'Fase febril tras inundación',v:[
+ {cuadro:'Enfermedad de Weil',sint:'Amarillo como un limón, escupiendo sangre y sin hacer pis.',
+  pistas:{interrogatorio:['Hombre de 42 años, recolector de residuos.','Trabaja entre basura con ratas.','Hace 10 días tuvo fiebre y dolor de piernas que mejoró.','Evolución: volvió la fiebre; hoy está amarillo y orina poco.'],
+   examen:['Ictericia rubínica, sufusión conjuntival y oliguria.','Hemoptisis y petequias: hemorragia pulmonar y vasculitis.'],
+   lab:['La microscopía directa no sirve: espiroqueta muy fina.','Hemocultivo ya negativo (pasaron los primeros 7-10 días); urocultivo en medio de Fletcher/EMJH +.','Microaglutinación (MAT) con título alto: confirmatoria.']},
+  clave:'Ratas + fiebre bifásica + ictericia + falla renal + hemorragia pulmonar + MAT + = enfermedad de Weil',
+  diferenciales:{typhi:'la fiebre tifoidea da roséola y bradicardia relativa, sin falla renal con ictericia.',menin:'la meningococcemia da púrpura y shock de horas.',brucella:'Brucella da fiebre ondulante tras leche cruda, sin ictericia.',eceh:'el SUH es en niños tras diarrea con sangre.'}},
+ {cuadro:'Meningitis aséptica en deportista',sint:'Un triatleta con los ojos rojos, la nuca dura y barro de río hasta las rodillas.',
+  pistas:{interrogatorio:['Hombre de 29 años, triatleta.','Hace 9 días compitió nadando en un río después de lluvias intensas.','Tenía raspones en las piernas.','Evolución: 5 días de fiebre y mialgias; ahora cefalea intensa.'],
+   examen:['Rigidez de nuca leve, sufusión conjuntival.','Dolor intenso a la palpación de las pantorrillas.'],
+   lab:['LCR claro con linfocitos y glucosa normal: meningitis aséptica.','Hemocultivo en medio especial (primeros 7 días): espiroquetas finas con extremos en gancho.','MAT con seroconversión.']},
+  clave:'Agua dulce tras lluvias + piel con raspones + fiebre + sufusión conjuntival + meningitis aséptica = leptospirosis anictérica',
+  diferenciales:{menin:'el meningococo da LCR turbio con PMN y glucosa baja.',trepo:'la sífilis no se adquiere en el agua.',spneu:'el neumococo da LCR purulento con diplococos.'}}]},
+
+chlam:{c0:'Cervicitis asintomática',v:[
+ {cuadro:'Neumonía del lactante',sint:'Un bebé que tose de a golpes cortos, sin fiebre, con los ojos lagañosos.',
+  pistas:{interrogatorio:['Lactante de 6 semanas.','La madre no tuvo controles; parto vaginal.','A las 2 semanas tuvo conjuntivitis.','Evolución: 10 días de tos en staccato y rinitis, sin fiebre.'],
+   examen:['Taquipnea con crepitantes difusos, AFEBRIL.','Conjuntivas con secreción mucopurulenta leve.'],
+   lab:['Gram: no se ve nada (intracelular obligada, sin peptidoglicano típico).','Eosinofilia periférica. Rx: infiltrado intersticial bilateral.','PCR de aspirado nasofaríngeo para C. trachomatis serovar D-K +.']},
+  clave:'Lactante de 1-3 meses + conjuntivitis previa + tos en staccato afebril + eosinofilia + PCR + = C. trachomatis',
+  diferenciales:{myco:'Mycoplasma afecta a escolares y jóvenes.',spneu:'el neumococo da fiebre y condensación con diplococos.',gono:'la oftalmía gonocócica aparece en los primeros días y es muy purulenta.'},
+  best:{macro:'Azitromicina o eritromicina oral: elección en lactantes.'},
+  nul:{doxi:'Doxiciclina contraindicada en lactantes: se deposita en hueso y dientes.',cipro:'Las quinolonas se evitan en lactantes.'}},
+ {cuadro:'Linfogranuloma venéreo',sint:'Un bubón inguinal que se parte en dos, como un surco.',
+  pistas:{interrogatorio:['Hombre de 34 años.','Tiene relaciones sexuales con hombres, sin preservativo.','Notó una pequeña úlcera indolora que desapareció.','Evolución: 3 semanas de un bulto inguinal doloroso; ahora proctitis.'],
+   examen:['Adenopatías inguinales y femorales separadas por el ligamento inguinal: «signo del surco».','Proctitis con secreción mucopurulenta.'],
+   lab:['Gram: sin gérmenes.','NAAT +; genotipificación: serovar L2 (invade linfáticos).','Cultivo celular McCoy con inclusiones que contienen glucógeno (yodo +).']},
+  clave:'HSH + úlcera fugaz + bubón inguinal con signo del surco + proctitis + serovar L = linfogranuloma venéreo',
+  diferenciales:{trepo:'el chancro sifilítico es duro e indoloro, con adenopatía que no supura.',gono:'la gonorrea da secreción purulenta sin bubón.',tbc:'la adenitis TBC es crónica, con BAAR.'},
+  best:{doxi:'Doxiciclina 21 días: elección en linfogranuloma venéreo.'},
+  ok:{macro:'Azitromicina: alternativa.'}}]},
+
+myco:{c0:'Neumonía caminante',v:[
+ {cuadro:'Miringitis bullosa con crioaglutininas',sint:'Le duele el oído, tose seco, y los dedos se le ponen violetas con el frío.',
+  pistas:{interrogatorio:['Mujer de 16 años.','En su curso hay varios con tos desde hace semanas.','Es invierno.','Evolución: 2 semanas de tos seca y desde ayer otalgia intensa.'],
+   examen:['Ampollas hemorrágicas en la membrana timpánica (miringitis bullosa).','Acrocianosis al frío; pocos ruidos agregados.'],
+   lab:['Gram: sin gérmenes (no tiene pared).','Crioaglutininas IgM anti-I +: aglutinan glóbulos rojos en frío (hemólisis).','PCR faríngea de M. pneumoniae +.']},
+  clave:'Adolescente + brote en el curso + tos seca prolongada + miringitis bullosa + crioaglutininas = Mycoplasma',
+  diferenciales:{spneu:'el neumococo da otitis media con tímpano abombado, no ampollas, y se ve con Gram.',chlam:'C. trachomatis da neumonía en lactantes.',legio:'Legionella da neumonía grave en mayores con diarrea.',psittaci:'la psitacosis requiere contacto con aves.'}},
+ {cuadro:'Mucositis y rash por Mycoplasma',sint:'Labios en carne viva, ojos rojos y una tos seca que no se va.',
+  pistas:{interrogatorio:['Nene de 10 años.','No tomó medicamentos nuevos (ni anticonvulsivantes ni sulfas).','Su hermana tuvo tos de semanas.','Evolución: 10 días de tos seca; ahora llagas en la boca y ojos rojos.'],
+   examen:['Mucositis oral grave con costras hemorrágicas en los labios y conjuntivitis.','Pocas lesiones cutáneas en diana; crepitantes leves.'],
+   lab:['Gram: sin gérmenes.','Rx: infiltrado intersticial más florido que la auscultación.','PCR de M. pneumoniae + e IgM específica.']},
+  clave:'Escolar + tos seca de semanas + mucositis grave sin fármaco desencadenante + PCR + = mucositis inducida por Mycoplasma',
+  diferenciales:{spyo:'la escarlatina da lengua aframbuesada y rash áspero, no mucositis con costras.',saureus:'el SPEE respeta las mucosas.',chlam:'C. trachomatis no da mucositis.'},
+  best:{macro:'Azitromicina: elección en chicos; actúa en la 50S y Mycoplasma no tiene pared que romper.'},
+  nul:{doxi:'Doxiciclina se evita en menores de 8 años.'}}]},
+
+brucella:{c0:'Tambero con fiebre ondulante',v:[
+ {cuadro:'Orquiepididimitis por queso de cabra',sint:'Un testículo enorme y una camisa empapada de sudor que huele a paja.',
+  pistas:{interrogatorio:['Hombre de 36 años.','Vende quesos de cabra frescos que trae del NOA.','Come el queso sin pasteurizar.','Evolución: un mes de fiebre vespertina con sudoración profusa; ahora dolor testicular.'],
+   examen:['Orquiepididimitis unilateral (el eritritol del tejido genital la atrae).','Hepatoesplenomegalia leve.'],
+   lab:['Hemocultivo en sistema automatizado, incubado 21 días: cocobacilos Gram − pequeños.','Medio de Castañeda: crece lento; ureasa +, oxidasa +.','Rosa de Bengala + y Wright con título alto (B. melitensis).']},
+  clave:'Queso de cabra crudo + fiebre con sudoración + orquiepididimitis + cocobacilo Gram − de crecimiento lento + Wright + = Brucella',
+  diferenciales:{tbc:'la TBC genital es crónica, con BAAR y piuria estéril.',typhi:'la fiebre tifoidea da roséola tras un viaje.',gono:'la epididimitis gonocócica viene con uretritis purulenta en jóvenes.',psittaci:'la psitacosis da neumonía tras contacto con aves.'}},
+ {cuadro:'Infección de laboratorio',sint:'Una laboratorista con dolor de cadera y fiebre que sube y baja.',
+  pistas:{interrogatorio:['Mujer de 30 años, bioquímica.','Hace 6 semanas procesó un hemocultivo «raro» fuera de la cabina de seguridad.','No toma leche cruda.','Evolución: un mes de fiebre ondulante, cansancio y dolor lumbar bajo.'],
+   examen:['Sacroileítis: dolor a la compresión de la articulación sacroilíaca.','Esplenomegalia.'],
+   lab:['Hemocultivo: cocobacilos Gram − pequeños de crecimiento lento.','Castañeda: catalasa +, oxidasa +, ureasa +.','Rosa de Bengala + y Wright +: Brucella es la primera causa de infección adquirida en el laboratorio (por aerosoles).']},
+  clave:'Bioquímica + aerosol de un cultivo + fiebre ondulante + sacroileítis + Wright + = brucelosis de laboratorio',
+  diferenciales:{tbc:'el mal de Pott afecta columna dorsal, con BAAR.',typhi:'la fiebre tifoidea no da sacroileítis.',lepto:'Leptospira se adquiere en agua, no en el laboratorio.'}}]},
+
+tbc:{c0:'Tisis cavitaria en HIV',v:[
+ {cuadro:'Meningitis tuberculosa en un nene',sint:'Un nene somnoliento con un ojo desviado y un abuelo que tose en la puerta.',
+  pistas:{interrogatorio:['Nene de 3 años.','Vive con su abuelo, que tose hace meses.','No recibió la BCG.','Evolución: 2 semanas de fiebre baja e irritabilidad; hoy está somnoliento.'],
+   examen:['Parálisis del VI par, rigidez de nuca leve.','Somnolencia: meningitis basilar con hidrocefalia.'],
+   lab:['LCR claro, linfocitos, glucosa MUY baja, proteínas muy altas, ADA elevado. Ziehl casi nunca +.','PCR GeneXpert MTB en LCR +; sensible a rifampicina.','Cultivo en Löwenstein-Jensen positivo a las 5 semanas. Rx: TBC miliar.']},
+  clave:'Contacto con tosedor crónico + sin BCG + meningitis subaguda basilar + LCR con linfocitos y glucosa muy baja + GeneXpert + = meningitis TBC',
+  diferenciales:{crypto:'Cryptococcus da meningitis subaguda en VIH, con tinta china +.',listeria:'Listeria da meningitis aguda en neonatos, mayores o inmunodeprimidos.',spneu:'el neumococo da meningitis aguda purulenta.',hib:'Hib da meningitis aguda purulenta en lactantes no vacunados.'},
+  ok:{cipro:'Las quinolonas son de segunda línea; acá va RIPE + corticoides.'}},
+ {cuadro:'Mal de Pott',sint:'Camina encorvado con una giba en la espalda y las piernas que le fallan.',
+  pistas:{interrogatorio:['Hombre de 40 años, migrante de Bolivia.','Vive en una vivienda hacinada.','No tiene tos ni fiebre alta.','Evolución: 6 meses de dolor dorsal; ahora debilidad en las piernas.'],
+   examen:['Giba dorsal (cifosis angular) y absceso frío paravertebral.','Paraparesia por compresión medular.'],
+   lab:['Biopsia del absceso: granuloma con necrosis caseosa y BAAR.','Cultivo en Löwenstein-Jensen + a las 6 semanas.','IGRA +. RM: destrucción de dos vértebras dorsales con el disco afectado.']},
+  clave:'Hacinamiento + dolor dorsal de meses + giba + absceso frío + granuloma caseoso con BAAR = mal de Pott',
+  diferenciales:{brucella:'la espondilitis por Brucella prefiere la columna LUMBAR, con fiebre ondulante tras leche cruda.',saureus:'la osteomielitis vertebral por S. aureus es aguda y piógena.',paraco:'Paracoccidioides da úlceras mucosas, no un absceso vertebral típico.'}}]},
+
+/* ---------- PISO 4 ---------- */
+calb:{c0:'Candidiasis oral en HIV',v:[
+ {cuadro:'Vulvovaginitis',sint:'Rascándose sin parar, con un flujo blanco grumoso como leche cortada.',
+  pistas:{interrogatorio:['Mujer de 28 años.','Terminó un tratamiento con amoxicilina la semana pasada (la microbiota vaginal se alteró).','Toma anticonceptivos orales.','Evolución: 4 días de prurito vulvar intenso y ardor.'],
+   examen:['Flujo blanco, grumoso, sin mal olor; vulva eritematosa con fisuras.','pH vaginal de 4 (normal): Candida no lo modifica.'],
+   lab:['KOH del flujo: levaduras con pseudohifas (forma invasora).','Sabouraud: colonias cremosas blancas en 48 h.','Tubo germinal +: C. albicans.']},
+  clave:'Antibióticos recientes + prurito + flujo en leche cortada + pH normal + levaduras con pseudohifas y tubo germinal + = vulvovaginitis candidiásica',
+  diferenciales:{chlam:'la cervicitis por Chlamydia es casi asintomática, sin flujo grumoso.',gono:'la cervicitis gonocócica da flujo purulento con diplococos Gram −.',ckru:'C. krusei es tubo germinal −.'},
+  best:{fluco:'Fluconazol oral en dosis única.'},
+  ok:{nista:'Nistatina en óvulos: tópica, sirve.'}},
+ {cuadro:'Candidemia por catéter',sint:'Fiebre que no cede, un catéter en el cuello y puntitos blancos en el fondo de ojo.',
+  pistas:{interrogatorio:['Hombre de 56 años en la UTI.','Tiene catéter venoso central y nutrición parenteral.','Recibe antibióticos de amplio espectro hace 10 días; operado del abdomen.','Evolución: fiebre que persiste pese a los antibióticos.'],
+   examen:['Sin foco bacteriano evidente.','Fondo de ojo: exudados algodonosos blancos (endoftalmitis candidiásica).'],
+   lab:['Hemocultivo: levaduras (en sangre nunca es contaminación).','CHROMagar: colonias verdes; tubo germinal +: C. albicans.','β-D-glucano sérico elevado.']},
+  clave:'UTI + catéter + nutrición parenteral + antibióticos + fiebre refractaria + levaduras en hemocultivo + tubo germinal + = candidemia por C. albicans',
+  diferenciales:{ckru:'C. krusei es tubo germinal − y da rosa en CHROMagar.',samr:'el SAMR da bacteriemia por catéter con cocos Gram +.',crypto:'Cryptococcus es capsulado y no forma pseudohifas.'},
+  best:{equino:'Equinocandina: elección en candidemia (fungicida y activa sobre el biofilm). Y se saca el catéter.'},
+  ok:{fluco:'Fluconazol: para pasar a vía oral cuando está estable y la especie es sensible (y llega bien al ojo).'},
+  nul:{nista:'La nistatina no se absorbe: no sirve para nada sistémico.'}},
+ {cuadro:'Dermatitis del pañal',sint:'Un bebé con la cola roja brillante y granitos sueltos alrededor.',
+  pistas:{interrogatorio:['Lactante de 9 meses.','Usa pañales descartables que le cambian poco.','Hace una semana tomó antibióticos por otitis.','Evolución: 5 días de lesión en la zona del pañal que no mejora con cremas comunes.'],
+   examen:['Placa roja brillante que toma los pliegues inguinales.','Pústulas SATÉLITES por fuera del borde.'],
+   lab:['KOH del raspado: levaduras y pseudohifas.','Sabouraud: colonias cremosas.','Tubo germinal +.']},
+  clave:'Pañal + antibióticos + placa roja que toma los pliegues + pústulas satélites + pseudohifas = candidiasis del pañal',
+  diferenciales:{dermato:'la tiña tiene borde activo neto, sin satélites.',saureus:'el impétigo ampolloso da ampollas y costras.',spyo:'el estreptococo perianal da eritema de borde neto sin satélites.'},
+  best:{nista:'Nistatina tópica: elección; no se absorbe y no hace falta más.'},
+  ok:{fluco:'Fluconazol oral funciona, pero es innecesario para una lesión de piel.'}}]},
+
+ckru:{c0:'Candidemia en neutropénico',v:[
+ {cuadro:'Endoftalmitis',sint:'Ve todo nublado de un ojo y en el vítreo flotan bolitas blancas.',
+  pistas:{interrogatorio:['Mujer de 48 años con leucemia.','Recibió fluconazol profiláctico por semanas.','Tuvo candidemia hace 10 días tratada con caspofungina.','Evolución: 3 días de visión borrosa y moscas volantes en el ojo derecho.'],
+   examen:['Vitritis con «bolas de algodón» en el vítreo.','Fiebre baja.'],
+   lab:['Aspirado vítreo: levaduras con pseudohifas.','CHROMagar: colonias ROSAS; tubo germinal −.','Antifungigrama: resistencia intrínseca a fluconazol (baja afinidad de la 14α-desmetilasa).']},
+  clave:'Profilaxis con fluconazol + candidemia previa + endoftalmitis + tubo germinal − + CHROMagar rosa = C. krusei',
+  diferenciales:{calb:'C. albicans es tubo germinal + y verde en CHROMagar.',asper:'Aspergillus da hifas tabicadas, no levaduras.',crypto:'Cryptococcus es una levadura capsulada sin pseudohifas.'},
+  best:{vori:'Voriconazol: cubre C. krusei y llega muy bien al vítreo.',anfo:'Anfotericina B liposomal: alternativa fungicida.'},
+  nul:{equino:'La equinocandina es elección en candidemia, pero llega MAL al ojo: en la endoftalmitis no alcanza.'}}]},
+
+crypto:{c0:'Meningitis en HIV',v:[
+ {cuadro:'Criptococosis cutánea diseminada',sint:'La cara llena de granitos con un hoyito en el centro, y una paloma en el hombro.',
+  pistas:{interrogatorio:['Hombre de 52 años, trasplantado de riñón hace un año.','Cría palomas en la terraza.','Toma tacrolimus y prednisona.','Evolución: 3 semanas de pápulas en la cara y cefalea leve.'],
+   examen:['Pápulas umbilicadas que parecen molusco contagioso.','Rigidez de nuca dudosa: la lesión de piel obliga a hacer punción lumbar.'],
+   lab:['Biopsia de piel con tinta china y mucicarmín: levaduras con cápsula gruesa.','Cultivo en agar alpiste negro (Guizotia): colonias MARRONES (fenoloxidasa). Ureasa +.','Antígeno capsular en suero y LCR +: hay meningitis.']},
+  clave:'Inmunodeprimido + palomas + pápulas umbilicadas + levadura capsulada marrón en alpiste negro + antígeno en LCR = criptococosis diseminada',
+  diferenciales:{histo:'Histoplasma son levaduras chiquitas dentro de macrófagos, sin cápsula.',calb:'Candida no tiene cápsula y forma pseudohifas.',dermato:'los dermatofitos no dan pápulas umbilicadas ni meningitis.'}},
+ {cuadro:'Meningitis con hipertensión endocraneana grave',sint:'Ve borroso, vomita en chorro y le late la cabeza como para estallar.',
+  pistas:{interrogatorio:['Mujer de 30 años con VIH sin tratamiento, CD4 de 40.','Vive en una casa vieja con palomares en el techo.','No toma profilaxis.','Evolución: un mes de cefalea progresiva; ahora visión borrosa.'],
+   examen:['Papiledema bilateral y parálisis del VI par; signos meníngeos leves.','Presión de apertura del LCR de 40 cm H₂O.'],
+   lab:['LCR claro con pocos linfocitos; tinta china: levaduras con halo.','Alpiste negro: colonias marrones; ureasa +.','Antígeno capsular con título muy alto: el polisacárido tapa las vellosidades aracnoideas.']},
+  clave:'VIH con CD4 bajo + palomas + cefalea subaguda + papiledema + presión de apertura altísima + tinta china + = criptococosis meníngea',
+  diferenciales:{tbc:'la meningitis TBC tiene glucosa muy baja y ADA alto, sin levaduras.',listeria:'Listeria da meningitis aguda con Gram +.',menin:'el meningococo da meningitis aguda purulenta.'},
+  best:{anfo:'Anfotericina B + flucitosina en la inducción, y punciones evacuadoras para bajar la presión: la hipertensión endocraneana es lo que mata.'}}]},
+
+asper:{c0:'Aspergilosis invasiva en neutropénico',v:[
+ {cuadro:'Aspergiloma',sint:'Tose sangre, y dentro del pecho rueda una bola de moho cuando se acuesta.',
+  pistas:{interrogatorio:['Hombre de 55 años.','Tuvo tuberculosis hace 15 años, curada, que le dejó una cavidad.','No es inmunodeprimido.','Evolución: 2 meses de hemoptisis leves repetidas.'],
+   examen:['Buen estado general, sin fiebre.','Rx: masa redonda dentro de la cavidad con una medialuna de aire arriba, que se mueve al cambiar de decúbito (signo de Monod).'],
+   lab:['Esputo: hifas finas tabicadas con ramificación a 45°.','Sabouraud sin cicloheximida: colonias verde azuladas; cabeza aspergilar.','IgG precipitante anti-Aspergillus +. El hongo coloniza la cavidad sin invadir la pared.']},
+  clave:'Cavidad de TBC curada + hemoptisis + bola móvil con medialuna de aire + hifas a 45° + precipitinas = aspergiloma',
+  diferenciales:{tbc:'la reactivación TBC da fiebre, sudoración y BAAR, no una bola móvil.',mucor:'Mucorales da hifas anchas no tabicadas en inmunodeprimidos.',histo:'Histoplasma da cavidades con levaduras intracelulares.'},
+  best:{itra:'Itraconazol si no se puede operar o hay síntomas. El tratamiento de fondo es la CIRUGÍA (o embolización si sangra): el hongo no invade.'},
+  ok:{vori:'Voriconazol funciona, pero acá la cirugía es lo que resuelve.'}},
+ {cuadro:'Aspergilosis broncopulmonar alérgica',sint:'Un asmático que escupe tapones marrones y silba al respirar.',
+  pistas:{interrogatorio:['Mujer de 24 años con asma desde la infancia.','El asma empeoró en los últimos meses pese a los inhaladores.','No es inmunodeprimida.','Evolución: tos con tapones de moco marrón y sibilancias.'],
+   examen:['Sibilancias difusas.','Rx: infiltrados migratorios; TC: bronquiectasias centrales.'],
+   lab:['Eosinofilia y cristales de Charcot-Leyden en el esputo.','IgE total mayor de 1000 UI/ml e IgE específica contra Aspergillus.','Prick test +: hipersensibilidad tipo I (y III).']},
+  clave:'Asma que empeora + tapones marrones + infiltrados migratorios + bronquiectasias centrales + IgE muy alta = ABPA',
+  diferenciales:{tbc:'la TBC no da eosinofilia ni IgE alta.',pjiro:'Pneumocystis aparece en inmunodeprimidos con vidrio esmerilado.',myco:'Mycoplasma da neumonía atípica sin eosinofilia.'},
+  best:{itra:'Itraconazol: baja la carga fúngica y permite bajar corticoides. La base es el CORTICOIDE: es una alergia.'},
+  ok:{vori:'Voriconazol: alternativa.'},
+  nul:{anfo:'La anfotericina no tiene lugar en una alergia: el problema es la respuesta exagerada.'}}]},
+
+histo:{c0:'Pulmonar aguda en espeleólogo',v:[
+ {cuadro:'Diseminada en SIDA',sint:'Pálido, flaco, con úlceras en la boca y el hígado que se le sale de la panza.',
+  pistas:{interrogatorio:['Hombre de 38 años con VIH sin tratamiento, CD4 de 40.','Vive en el conurbano bonaerense (zona endémica).','Trabajó demoliendo un galpón con palomas.','Evolución: 6 semanas de fiebre, diarrea y pérdida de 10 kilos.'],
+   examen:['Hepatoesplenomegalia, adenopatías y úlceras orales de fondo granulomatoso.','Pápulas cutáneas.'],
+   lab:['Frotis de sangre con Giemsa: levaduras chiquitas DENTRO de macrófagos y neutrófilos.','Cultivo a 28 °C: macroconidios tuberculados; a 37 °C: levaduras.','Antígeno de Histoplasma en orina +. Pancitopenia por infiltración de médula.']},
+  clave:'SIDA + zona endémica + fiebre, hepatoesplenomegalia y pancitopenia + levaduras intracelulares + antígeno urinario = histoplasmosis diseminada',
+  diferenciales:{crypto:'Cryptococcus es capsulado y extracelular, con tinta china +.',tbc:'la TBC diseminada da BAAR, no levaduras.',pjiro:'Pneumocystis da neumonía, no hepatoesplenomegalia.',paraco:'Paracoccidioides son levaduras grandes en rueda de timón.'},
+  best:{anfo:'Anfotericina B liposomal en la forma grave; después itraconazol de mantenimiento.'},
+  ok:{itra:'Itraconazol: para mantenimiento después de la anfotericina.'}},
+ {cuadro:'Pulmonar crónica cavitaria',sint:'Un fumador que tose hace meses, con dos agujeros en lo alto de los pulmones.',
+  pistas:{interrogatorio:['Hombre de 62 años, EPOC, fumador.','Vive en Entre Ríos, cerca del río; tiene gallinero.','Tres baciloscopías negativas.','Evolución: 5 meses de tos productiva, pérdida de peso y hemoptisis leve.'],
+   examen:['Roncus y crepitantes en ambos vértices.','Adelgazado, sin fiebre alta.'],
+   lab:['Esputo con Giemsa: levaduras pequeñas intracelulares.','Cultivo a 28 y 37 °C: conversión de moho a levadura; macroconidios tuberculados.','Inmunodifusión (bandas H y M) +.']},
+  clave:'EPOC + gallinero en zona húmeda + cavidades apicales + BAAR negativos + levaduras chiquitas intracelulares = histoplasmosis crónica',
+  diferenciales:{tbc:'la TBC tendría BAAR.',paraco:'Paracoccidioides da infiltrados en alas de mariposa y úlceras mucosas, con levaduras grandes.',asper:'Aspergillus da hifas, no levaduras.',cocci:'Coccidioides es del oeste árido y forma esférulas.'}}]},
+
+paraco:{c0:'Crónica del adulto con estomatitis',v:[
+ {cuadro:'Forma juvenil ganglionar',sint:'Un adolescente con el cuello lleno de ganglios que supuran, sin tos.',
+  pistas:{interrogatorio:['Varón de 16 años de Misiones.','Ayuda a su familia en la chacra.','Antes de la pubertad no hay protección estrogénica: afecta igual a ambos sexos.','Evolución: 2 meses de fiebre, adenopatías que crecen y pérdida de peso.'],
+   examen:['Adenopatías cervicales y axilares masivas que fistulizan; hepatoesplenomegalia.','Sin lesiones mucosas y pulmones casi limpios.'],
+   lab:['Punción ganglionar con KOH: levaduras GRANDES con gemación múltiple en rueda de timón.','Cultivo: a 37 °C, levaduras multigemantes.','Serología gp43 + con título alto (sirve para el seguimiento).']},
+  clave:'Adolescente rural del NEA + adenopatías masivas que supuran + hepatoesplenomegalia sin tos + rueda de timón = paracoccidioidomicosis juvenil',
+  diferenciales:{histo:'Histoplasma son levaduras chiquitas intracelulares.',tbc:'la adenitis TBC tiene BAAR y granulomas caseosos.',brucella:'Brucella da fiebre ondulante tras leche cruda.',sporo:'Sporothrix da nódulos linfáticos en un miembro tras una espina.'},
+  best:{anfo:'Anfotericina B en la forma grave diseminada; después itraconazol o TMP-SMX.',itra:'Itraconazol: para completar meses de tratamiento.'}},
+ {cuadro:'Insuficiencia suprarrenal décadas después',sint:'Bronceado sin haber tomado sol, débil y con la presión por el piso.',
+  pistas:{interrogatorio:['Hombre de 65 años que vive en Buenos Aires.','Trabajó en el desmonte en Chaco hasta los 40 años.','Fumador de 40 paquetes/año.','Evolución: meses de cansancio, pérdida de peso y mareos al pararse.'],
+   examen:['Hiperpigmentación de piel y mucosas; hipotensión ortostática.','Cicatrices de úlceras en encías.'],
+   lab:['Sodio bajo, potasio alto, cortisol bajo: Addison.','TC: suprarrenales agrandadas; biopsia con levaduras multibrotantes en rueda de timón.','Serología gp43 +. La reactivación ocurrió décadas después de la exposición.']},
+  clave:'Ex trabajador rural del NEA + décadas de latencia + Addison + levaduras en rueda de timón = paracoccidioidomicosis crónica',
+  diferenciales:{tbc:'la TBC suprarrenal es la otra gran causa de Addison infeccioso, con BAAR.',histo:'Histoplasma también afecta suprarrenales, pero son levaduras chiquitas intracelulares.',calb:'Candida no da Addison.'}}]},
+
+pjiro:{c0:'Neumonía en HIV',v:[
+ {cuadro:'Neumonía al bajar los corticoides',sint:'Una señora que se ahoga al caminar dos pasos y tiene los pulmones de vidrio.',
+  pistas:{interrogatorio:['Mujer de 60 años con artritis reumatoidea.','Toma prednisona en dosis altas hace 3 meses; la están bajando.','No recibe profilaxis con TMP-SMX.','Evolución: 5 días de disnea que avanza rápido y tos seca.'],
+   examen:['Desaturación con mínimo esfuerzo, auscultación casi normal.','Taquipnea, fiebre moderada.'],
+   lab:['LBA con Grocott: quistes negros «en copa» sobre fondo verde, en exudado espumoso.','β-D-glucano sérico muy alto. No se cultiva.','LDH elevada; TC con vidrio esmerilado bilateral.']},
+  clave:'Corticoides en dosis altas sin profilaxis + disnea rápida al bajar la dosis + vidrio esmerilado + Grocott + = Pneumocystis',
+  diferenciales:{asper:'Aspergillus da nódulos con halo en neutropénicos, con hifas.',legio:'Legionella da consolidación con hiponatremia y antígeno urinario +.',myco:'Mycoplasma afecta jóvenes sanos.',crypto:'Cryptococcus es una levadura capsulada con tinta china +.'}}]},
+
+dermato:{c0:'Tiña corporis por gato',v:[
+ {cuadro:'Querion de Celso',sint:'Un nene con una placa hinchada y supurada en la cabeza, y un gatito en brazos.',
+  pistas:{interrogatorio:['Nene de 6 años.','Adoptaron un gatito hace un mes.','Antes de la pubertad no hay ácidos grasos fungistáticos en el sebo del cuero cabelludo.','Evolución: 3 semanas; empezó como una placa con descamación y se inflamó.'],
+   examen:['Placa elevada, dolorosa, con pus por los orificios foliculares y alopecia.','Adenopatía occipital. Luz de Wood: fluorescencia verde.'],
+   lab:['KOH de los pelos arrancados con pinza: parasitismo ECTOTHRIX.','Cultivo a 28 °C: macroconidios fusiformes de pared gruesa y rugosa; reverso amarillo.','Microsporum canis: zoofílico, por eso inflama tanto.']},
+  clave:'Nene + gatito + placa supurada en cuero cabelludo + Wood verde + ectothrix + macroconidios fusiformes = querion por M. canis',
+  diferenciales:{saureus:'el absceso estafilocócico no da alopecia con pelos parasitados.',calb:'Candida no afecta el pelo.',sporo:'Sporothrix da nódulos en un miembro.'},
+  best:{griseo:'Griseofulvina oral: la clásica de la tiña capitis por Microsporum; se deposita en la queratina nueva del pelo.'},
+  ok:{terbi:'Terbinafina oral: muy buena en Trichophyton, algo menos en Microsporum.',itra:'Itraconazol oral: alternativa.'},
+  nul:{fluco:'La crema o los azoles tópicos no llegan al folículo; el fluconazol oral rinde poco en dermatofitos.'}},
+ {cuadro:'Onicomicosis',sint:'Las uñas de los pies gruesas, amarillas y desmigajadas.',
+  pistas:{interrogatorio:['Hombre de 55 años, diabético.','Va a la pileta del club y camina descalzo en el vestuario.','Tiene pie de atleta hace años.','Evolución: 2 años de uñas que se engrosan.'],
+   examen:['Uñas engrosadas, amarillentas, con hiperqueratosis subungueal y despegadas desde el borde libre (onicólisis).','Sin perionixis; descamación interdigital.'],
+   lab:['Raspado del lecho subungueal desde el borde libre con KOH: hifas hialinas tabicadas y artroconidios.','Cultivo: pocos macroconidios lisos «en lápiz» y muchos microconidios.','Reverso de la colonia rojo vino: T. rubrum.']},
+  clave:'Pileta y vestuario + pie de atleta + uñas engrosadas con onicólisis distal + hifas tabicadas + reverso rojo vino = onicomicosis por T. rubrum',
+  diferenciales:{calb:'Candida prefiere las manos en agua y da perionixis.',pseudo:'Pseudomonas tiñe la uña de verde sin engrosarla así.',asper:'Aspergillus rara vez es causa primaria de onicomicosis.'},
+  best:{terbi:'Terbinafina oral 12 semanas: fungicida y se deposita en la uña nueva que crece.'},
+  ok:{itra:'Itraconazol en pulsos: alternativa.'},
+  nul:{griseo:'La griseofulvina rinde mal en uñas: el tratamiento sería larguísimo.'}}]},
+
+sporo:{c0:'Linfocutánea en jardinera',v:[
+ {cuadro:'Transmisión por gato',sint:'Una veterinaria con un arañazo que se ulceró y nódulos que le suben por el brazo.',
+  pistas:{interrogatorio:['Mujer de 32 años, veterinaria.','Atendió a un gato callejero con úlceras en la cara.','El gato la arañó en la mano.','Evolución: 3 semanas; la herida se ulceró y aparecieron nódulos hacia el codo.'],
+   examen:['Chancro de inoculación ulcerado en la mano.','Nódulos escalonados que suben por el trayecto linfático del brazo.'],
+   lab:['Directo del pus: poco sensible; Gram y Kinyoun para descartar Nocardia.','Cultivo a 28 °C: conidios en margarita; a 37 °C: levaduras en cigarro (conversión).','S. brasiliensis: el gato tiene muchísimas levaduras en sus lesiones.']},
+  clave:'Arañazo de gato enfermo + chancro + nódulos en rosario + conversión moho-levadura = esporotricosis zoonótica',
+  diferenciales:{dermato:'los dermatofitos no siguen los linfáticos.',saureus:'S. aureus da linfangitis aguda con fiebre, no nódulos en rosario de semanas.',tbc:'Mycobacterium marinum (acuarios) da un cuadro parecido; el Ziehl y el cultivo lo separan.'}},
+ {cuadro:'Cutánea fija',sint:'Una sola placa verrugosa en la cara que no se mueve de lugar.',
+  pistas:{interrogatorio:['Nene de 9 años de Corrientes.','Juega entre pastizales y fardos de heno.','En la zona hay muchos casos; probablemente ya estaba sensibilizado.','Evolución: 2 meses de una lesión en la mejilla que crece lento.'],
+   examen:['Placa verrugosa única de bordes elevados, sin nódulos linfáticos.','Sin adenopatías ni fiebre.'],
+   lab:['Biopsia: granuloma supurativo con cuerpos asteroides (Splendore-Hoeppli).','Cultivo a 28 °C: colonias que se oscurecen, conidios en margarita.','Conversión a levaduras a 37 °C.']},
+  clave:'Zona endémica + lesión única verrugosa que no se disemina + cuerpos asteroides + dimórfico = esporotricosis cutánea fija',
+  diferenciales:{dermato:'la tiña tiene borde activo con centro claro.',paraco:'Paracoccidioides da úlceras mucosas en adultos rurales.',spyo:'el impétigo da costras melicéricas.'}}]},
+
+mucor:{c0:'Rinocerebral en cetoacidosis',v:[
+ {cuadro:'Pulmonar con profilaxis de voriconazol',sint:'Un trasplantado de médula que tose sangre a chorros, y el voriconazol le resbala.',
+  pistas:{interrogatorio:['Hombre de 44 años, trasplantado de médula ósea.','Recibe profilaxis con voriconazol por neutropenia prolongada.','Tiene corticoides por enfermedad injerto contra huésped.','Evolución: 3 días de fiebre, dolor pleurítico y hemoptisis.'],
+   examen:['Hemoptisis masiva; taquipnea.','TC: consolidación con «halo invertido».'],
+   lab:['Biopsia: hifas ANCHAS, en cinta, sin tabiques, ramificadas a 90°, invadiendo vasos.','Galactomanano y β-D-glucano NEGATIVOS.','Cultivo rápido de algodón gris; esporangios con columela y rizoides.']},
+  clave:'Neutropénico con profilaxis de voriconazol + infarto pulmonar con halo invertido + hifas anchas a 90° + biomarcadores negativos = mucormicosis de brecha',
+  diferenciales:{asper:'Aspergillus da hifas finas tabicadas a 45° y galactomanano +.',pseudo:'Pseudomonas es una bacteria.',ckru:'Candida son levaduras.'}},
+ {cuadro:'Cutánea por herida con tierra',sint:'Una herida de la pierna que se pone negra y avanza a ojos vista.',
+  pistas:{interrogatorio:['Mujer de 35 años.','Sufrió un accidente en moto y la herida quedó llena de tierra.','Está en la UTI con corticoides; desarrolló diabetes por estrés.','Evolución: 4 días; la herida se necrosa cada vez más.'],
+   examen:['Escara negra con bordes violáceos que crece de un día a otro.','Sin crepitación.'],
+   lab:['Biopsia del borde: hifas anchas cenocíticas a 90° invadiendo vasos.','Cultivo: crece en 24-48 h; Rhizopus con rizoides.','Galactomanano negativo.']},
+  clave:'Herida con tierra + corticoides + escara negra que avanza rápido + hifas anchas sin tabiques a 90° = mucormicosis cutánea',
+  diferenciales:{perfri:'la gangrena gaseosa da crepitación y bacilos Gram +.',pseudo:'el ectima gangrenoso es bacteriano, en neutropénicos.',asper:'Aspergillus da hifas finas tabicadas.'}}]},
+
+/* ---------- PATÓGENOS NUEVOS ---------- */
+sagal:{c0:'Sepsis neonatal precoz',v:[
+ {cuadro:'Meningitis neonatal tardía',sint:'Un bebé de tres semanas con la fontanela tensa y cadenas cortas colgándole de los dedos.',
+  pistas:{interrogatorio:['Lactante de 3 semanas, nacido a término.','La madre recibió penicilina intraparto por hisopado + (eso previene la forma precoz, no la tardía).','Toma pecho; sin hermanos.','Evolución: 24 horas de fiebre, irritabilidad y rechazo del alimento.'],
+   examen:['Fontanela abombada, irritabilidad.','Sin rash ni petequias.'],
+   lab:['LCR: cocos Gram + en pares y cadenas cortas; glucosa baja, PMN.','Cultivo: β-hemólisis estrecha, catalasa −, bacitracina RESISTENTE.','CAMP +, hipurato +; aglutinación grupo B de Lancefield.']},
+  clave:'Lactante de 1 a 12 semanas + meningitis + coco Gram + en cadena catalasa − bacitracina R CAMP + = S. agalactiae tardío',
+  diferenciales:{ecoli:'E. coli K1 es bacilo Gram −.',listeria:'Listeria es bacilo Gram + catalasa + con movilidad.',spneu:'el neumococo es α-hemolítico y sensible a optoquina.',spyo:'S. pyogenes es bacitracina sensible y CAMP −.'},
+  best:{amoxi:'Ampicilina (con cefotaxima empírica al principio): pasa la BHE inflamada.',ceftri:'Cefalosporina de 3.ª (cefotaxima en el neonato) en el esquema empírico.'}}]},
+
+proteus:{c0:'ITU con cálculo coraliforme',v:[
+ {cuadro:'Sonda incrustada en anciano',sint:'Un anciano con la sonda tapada de cristales y una orina que huele a amoníaco.',
+  pistas:{interrogatorio:['Hombre de 82 años, sondado hace 4 meses.','Vive en un geriátrico.','La sonda se obstruye cada pocos días.','Evolución: 2 días de fiebre y orina turbia.'],
+   examen:['Orina turbia con olor amoniacal; incrustaciones blancas en la sonda.','Dolor suprapúbico; fiebre de 38,5 °C.'],
+   lab:['pH urinario de 8,5 con cristales de estruvita: la ureasa parte la urea y alcaliniza.','Agar sangre: velo invasor que cubre toda la placa (swarming); lactosa −, H₂S +.','Ureasa + intensa; resistente a nitrofurantoína y colistina.']},
+  clave:'Sonda que se obstruye con cristales + orina alcalina con estruvita + swarming + ureasa + = Proteus mirabilis',
+  diferenciales:{ecoli:'E. coli fermenta lactosa y no alcaliniza la orina.',pseudo:'Pseudomonas es no fermentador oxidasa +.',entero:'Enterococcus es coco Gram +.',kleb:'Klebsiella es inmóvil y lactosa +.'}}]},
+
+psittaci:{c0:'Neumonía en dueño de loros',v:[
+ {cuadro:'Brote en criadero de aves',sint:'Una avicultora con la cabeza a punto de explotar y una tos seca entre plumas.',
+  pistas:{interrogatorio:['Mujer de 41 años, trabaja en un criadero de cotorras.','Limpia jaulas con excremento seco sin barbijo.','Varias aves enfermaron y murieron el mes pasado.','Evolución: 6 días de fiebre alta, cefalea intensa y tos seca.'],
+   examen:['Esplenomegalia y bradicardia relativa.','Confusión leve; pocos ruidos pulmonares.'],
+   lab:['Gram: sin gérmenes (intracelular obligada).','Rx: infiltrado más florido que la auscultación; transaminasas elevadas.','Serología: microinmunofluorescencia con aumento de 4 veces; PCR de C. psittaci +.']},
+  clave:'Criadero de aves + aves muertas + fiebre con cefalea intensa + neumonía atípica + esplenomegalia + serología + = psitacosis',
+  diferenciales:{legio:'Legionella se asocia al agua de torres, con hiponatremia y antígeno urinario +.',myco:'Mycoplasma afecta jóvenes sin aves y da crioaglutininas.',typhi:'la fiebre tifoidea da roséola tras un viaje.',crypto:'Cryptococcus también se asocia a palomas, pero es una levadura capsulada en inmunodeprimidos.'}}]},
+
+cocci:{c0:'Fiebre del valle en el oeste árido',v:[
+ {cuadro:'Diseminada en embarazada',sint:'Una embarazada con nódulos en la piel, dolor de huesos y fiebre que no cede.',
+  pistas:{interrogatorio:['Mujer de 30 años, embarazada de 32 semanas.','Vive en La Rioja; hubo tormentas de polvo.','El tercer trimestre predispone a la diseminación (al revés que en Paracoccidioides).','Evolución: 3 semanas de fiebre, tos y dolor en la columna.'],
+   examen:['Nódulos y úlceras verrugosas en la piel.','Dolor vertebral a la percusión: osteomielitis.'],
+   lab:['Biopsia de piel con KOH: esférulas grandes de doble pared llenas de endosporas.','Cultivo (avisar al laboratorio: muy peligroso): moho blanco con artroconidios en tonel alternados con células vacías.','Fijación de complemento IgG con título alto: correlaciona con la diseminación.']},
+  clave:'Embarazada del oeste árido + tormenta de polvo + lesiones de piel y hueso + esférulas con endosporas + FC alta = coccidioidomicosis diseminada',
+  diferenciales:{histo:'Histoplasma son levaduras chiquitas intracelulares.',paraco:'Paracoccidioides es del NEA y forma rueda de timón.',tbc:'el Pott tiene BAAR y no esférulas.'},
+  best:{anfo:'Anfotericina B: la droga segura en el embarazo para micosis graves.'},
+  nul:{fluco:'Los azoles son TERATOGÉNICOS: en el embarazo no.',itra:'Los azoles son teratogénicos: en el embarazo no.'}},
+ {cuadro:'Meningitis basilar crónica',sint:'Un hombre con la cabeza grande de líquido, confuso, con polvo del desierto en las botas.',
+  pistas:{interrogatorio:['Hombre de 45 años con VIH, CD4 de 90.','Trabajó en excavaciones en San Juan.','Tuvo una neumonía «que se curó sola» hace un año.','Evolución: 2 meses de cefalea, confusión y marcha torpe.'],
+   examen:['Rigidez de nuca leve, ataxia; signos de hidrocefalia.','Sin lesiones de piel.'],
+   lab:['LCR claro, linfocitos con algunos eosinófilos, proteínas altas, glucosa baja.','Fijación de complemento en LCR +: diagnóstico de meningitis.','Cultivo con artroconidios en tonel (bioseguridad nivel 3).']},
+  clave:'Excavación en el oeste árido + VIH + meningitis crónica basilar con eosinófilos + fijación de complemento en LCR = meningitis por Coccidioides',
+  diferenciales:{crypto:'Cryptococcus da tinta china + y antígeno capsular.',tbc:'la meningitis TBC tiene ADA alto y GeneXpert +.',histo:'Histoplasma rara vez da meningitis aislada.'},
+  best:{fluco:'Fluconazol DE POR VIDA: penetra muy bien el LCR y, si se suspende, recae.'},
+  ok:{anfo:'Anfotericina B: en formas graves (a veces intratecal).'}}]}
+};
+
 const EBY=Object.fromEntries(E.map(e=>[e.id,e]));
+// Los patógenos nuevos también entran como diferenciales de los bichos con los que se confunden.
+[['listeria','sagal','S. agalactiae también es CAMP +, pero es coco Gram + en cadena, catalasa − e inmóvil.'],
+ ['ecoli','proteus','Proteus es lactosa −, ureasa + y alcaliniza la orina (cálculos de estruvita).'],
+ ['legio','psittaci','la psitacosis aparece tras contacto con loros o aves, y no da hiponatremia ni antígeno urinario +.'],
+ ['myco','psittaci','C. psittaci requiere contacto con aves y da fiebre alta con esplenomegalia.'],
+ ['histo','cocci','Coccidioides es del oeste árido y en el tejido forma esférulas con endosporas, no levaduras.'],
+ ['paraco','cocci','Coccidioides es del oeste árido y forma esférulas con endosporas, no rueda de timón.']
+].forEach(([a,b,t])=>{EBY[a].diferenciales[b]=t});
+Object.entries(CASOS).forEach(([id,c])=>{EBY[id].cuadro=c.c0;EBY[id].casos=c.v||[]});
+const nCasos=e=>1+(e.casos||[]).length;
+const cuadros=e=>[e.cuadro].concat((e.casos||[]).map(v=>v.cuadro));
+// Arma el paciente concreto: el base (ci 0) o una variante que pisa pistas, clave y diferenciales, y retoca armas.
+function caseOf(id,ci){
+ const b=EBY[id],v=ci?(b.casos||[])[ci-1]:null,K=['best','ok','res','nul'];
+ if(!v)return Object.assign({},b,{ci:0});
+ const d=Object.assign({},b,{ci,cuadro:v.cuadro,sint:v.sint||b.sint,clave:v.clave,diferenciales:v.diferenciales||b.diferenciales,
+  pistas:{interrogatorio:v.pistas.interrogatorio,examen:v.pistas.examen,lab:v.pistas.lab||b.pistas.lab}});
+ K.forEach(k=>d[k]=Object.assign({},b[k]||{}));
+ K.forEach(k=>{if(v[k])Object.keys(v[k]).forEach(w=>{K.forEach(j=>delete d[j][w]);d[k][w]=v[k][w]})});
+ return d;
+}
 const FLOORS={1:'Guardia · Gram +',2:'Terapia · Gram −',3:'Aislamiento · anaerobios y atípicos',4:'Micoteca · hongos',0:'Mezcla total'};
 const STAIN={pos:['Gram + (violeta)','#7c3aed'],neg:['Gram − (rosa)','#ec4899'],baar:['Ziehl-Neelsen: BAAR (rojo)','#dc2626'],azul:['Azul de lactofenol','#3b82f6'],tinta:['Tinta china: halo capsular','#cbd5e1'],grocott:['Grocott (plata)','#334155'],oscuro:['Campo oscuro: no se tiñe','#f1f5f9'],nada:['No se tiñe con Gram','#94a3b8']};
 
@@ -825,10 +1611,10 @@ function nextEnemy(){
  else id=S.queue.shift();
  if(!id){floorClear();return}
  S.room++;
- const d=EBY[id];
+ const base=EBY[id],d=caseOf(id,Math.floor(Math.random()*nCasos(base)));
  const hp=d.boss?150:100;
  const hc={int:[],ex:[],lab:[],vir:[]};
- const rec={id:d.id,boss:!!d.boss,where:(S.mode==='mix'?'Mezcla':'Piso '+S.floor)+' · Sala '+S.room,known:false,sint:d.sint,hc,dx:{ok:false,wrong:[],n:0,mult:1},shots:[],out:'open'};
+ const rec={id:d.id,ci:d.ci,boss:!!d.boss,where:(S.mode==='mix'?'Mezcla':'Piso '+S.floor)+' · Sala '+S.room,known:false,sint:d.sint,hc,dx:{ok:false,wrong:[],n:0,mult:1},shots:[],out:'open'};
  S.hist.push(rec);
  S.enemy={d,rec,hc,hp,max:hp,dist:3,disp:0.12,scanned:false,labN:0,diag:false,mult:1,misses:0,hint:false,wrong:[],dying:-1,flash:-9,shield:-9,hitT:-9};
  const sep={k:'sala',room:S.hist.length-1,h:salaHead(rec)};S.journal.push(sep);appendLine(sep,true);
@@ -897,7 +1683,7 @@ async function pickDx(id){
  closeOv();const e=S.enemy,d=e.d;S.busy=true;
  if(id===d.id){
   const n=clues(e);e.diag=true;e.mult=multFor(n);Object.assign(e.rec.dx,{ok:true,n,mult:e.mult});reveal(e.rec);
-  say('<b class="good">Diagnóstico confirmado.</b> '+d.clave+' = <b>'+d.n+'</b>. Con '+n+' pista'+(n===1?'':'s')+', tus disparos pegan ×'+fmt(e.mult)+'.','dx');
+  say('<b class="good">Diagnóstico confirmado.</b> '+d.clave+' = <b>'+d.n+'</b> · <i>'+d.cuadro+'</i>. Con '+n+' pista'+(n===1?'':'s')+', tus disparos pegan ×'+fmt(e.mult)+'.','dx');
   S.xp+=30+Math.round((e.mult-1.3)*100);
  }else{
   e.wrong.push(id);e.rec.dx.wrong.push(id);const why=d.diferenciales&&d.diferenciales[id];
@@ -956,7 +1742,7 @@ async function kill(){
  const e=S.enemy;e.dying=now();S.busy=true;e.rec.out='kill';reveal(e.rec);render();
  let gain=e.d.boss?300:100;if(e.diag)gain+=50;const clean=e.misses===0;if(clean){gain+=50;S.clean++}
  S.xp+=gain;S.kills++;saveLast();
- const rec=dex[e.d.id]||{k:0,dx:false};rec.k++;if(e.diag)rec.dx=true;dex[e.d.id]=rec;store.set('gz-dex',dex);
+ const rec=dex[e.d.id]||{k:0,dx:false};rec.k++;if(e.diag)rec.dx=true;rec.cs=rec.cs||[];if(!rec.cs.includes(e.d.ci))rec.cs.push(e.d.ci);dex[e.d.id]=rec;store.set('gz-dex',dex);
  await wait(1100);
  const heal=Math.min(15,100-S.hp);S.hp+=heal;
  showFicha(e.d,{gain,clean,heal,after:true});
@@ -991,12 +1777,13 @@ function gameOver(){
 /* ============ OVERLAYS ============ */
 function openOv(html,wide){const b=$('ovbox');b.className='box'+(wide?' wide':'');b.innerHTML=html;$('ov').hidden=false;b.scrollTop=0;const c=b.querySelector('[data-close]');if(c)c.onclick=closeOv;const f=b.querySelector('button');if(f)f.focus()}
 function closeOv(){$('ov').hidden=true}
-const fichaDl=d=>{const fi=d.ficha;return '<div class="ficha"><dl><div><dt>Morfología</dt><dd>'+fi.m+'</dd></div><div><dt>Factores de virulencia</dt><dd>'+fi.v+'</dd></div><div><dt>Cuadro</dt><dd>'+fi.c+'</dd></div><div><dt>Tratamiento</dt><dd>'+fi.t+'<br><span style="color:var(--mute);font-size:13px">En el juego: '+Object.keys(d.best).map(k=>WBY[k].n).join(' · ')+'</span></dd></div><div class="trap"><dt>Trampa de examen</dt><dd>'+fi.x+'</dd></div></dl></div>'};
+const fichaDl=d=>{const fi=d.ficha;return '<div class="ficha"><dl><div><dt>Morfología</dt><dd>'+fi.m+'</dd></div><div><dt>Factores de virulencia</dt><dd>'+fi.v+'</dd></div><div><dt>Cuadro</dt><dd>'+fi.c+'</dd></div><div><dt>Tratamiento</dt><dd>'+fi.t+'<br><span style="color:var(--mute);font-size:13px">En el juego: '+Object.keys(d.best).map(k=>WBY[k].n).join(' · ')+'</span></dd></div><div class="trap"><dt>Trampa de examen</dt><dd>'+fi.x+'</dd></div>'+
+ '<div><dt>Pacientes que pueden llegar a la guardia</dt><dd>'+cuadros(EBY[d.id]).map((c,i)=>i===d.ci?'<b style="color:var(--accent)">▶ '+c+'</b>':c).join(' · ')+'</dd></div></dl></div>'};
 function showFicha(d,o){
  o=o||{};const st=STAIN[d.stain];
  openOv((o.after?'<h3>Registrado en el bestiario'+(o.clean?' · tiro limpio':'')+'</h3>':'<h3>Ficha · Piso '+d.f+'</h3>')+
  '<h2>'+d.n+'</h2><div class="stainrow"><span class="dot" style="background:'+st[1]+'"></span>'+st[0]+(d.boss?' · <b style="color:var(--danger)">Jefe</b>':'')+'</div>'+
- (o.after?'<p class="lead">'+d.clave+'.</p>':'')+fichaDl(d)+
+ (o.after?'<p class="lead"><b>'+d.cuadro+'.</b> '+d.clave+'.</p>':'')+fichaDl(d)+
  (o.after?'<div class="statline"><span>XP <b>+'+o.gain+'</b></span>'+(o.heal?'<span>Salud <b>+'+o.heal+'</b></span>':'')+'</div><button class="btn main" id="goOn"><span class="t">Siguiente sala</span><span class="s">Enter</span></button>':
   '<button class="btn" id="goBack"><span class="t">Volver</span></button>'));
  if(o.after)$('goOn').onclick=()=>{closeOv();nextEnemy()};
@@ -1022,7 +1809,7 @@ function bestiario(){
  const seen=E.filter(e=>dex[e.id]).length;
  let html='<h3>Bestiario · '+seen+' de '+E.length+'</h3><h2>Tu colección de patógenos</h2><p class="lead">Cada bicho que bajás queda con su ficha. La estrella marca los que diagnosticaste vos.</p><button class="btn" id="bArs"><span class="t">Arsenal</span><span class="s">fichas de las '+W.length+' armas</span></button>';
  [1,2,3,4].forEach(f=>{html+='<h3>Piso '+f+' · '+FLOORS[f]+'</h3><div class="bgrid">'+E.filter(e=>e.f===f).map(e=>{const r=dex[e.id];
-  return r?'<button class="bcard" data-f="'+e.id+'"><span class="bn">'+(r.dx?'★ ':'')+e.n+'</span><span class="bs">'+STAIN[e.stain][0]+' · ×'+r.k+'</span></button>':'<div class="bcard unseen"><span class="bn">???</span><span class="bs">'+(e.boss?'Jefe':'Sin encontrar')+'</span></div>'}).join('')+'</div>'});
+  return r?'<button class="bcard" data-f="'+e.id+'"><span class="bn">'+(r.dx?'★ ':'')+e.n+'</span><span class="bs">'+STAIN[e.stain][0]+' · ×'+r.k+' · '+(r.cs||[0]).length+'/'+nCasos(e)+' cuadros</span></button>':'<div class="bcard unseen"><span class="bn">???</span><span class="bs">'+(e.boss?'Jefe':'Sin encontrar')+'</span></div>'}).join('')+'</div>'});
  html+='<button class="btn" id="bk"><span class="t">Volver</span></button>';
  openOv(html);$('bk').onclick=back;$('bArs').onclick=()=>arsenal(bestiario);
  $('ovbox').querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>showFicha(EBY[b.dataset.f],{back:bestiario}));
@@ -1036,8 +1823,8 @@ const strip=s=>String(s).replace(/<[^>]+>/g,'');
 const hcGroups=r=>[['Interrogatorio',r.hc.int],['Examen físico',r.hc.ex],['Laboratorio',r.hc.lab.map((x,i)=>LABN[i]+': '+x)],['Factores de virulencia',r.hc.vir.map(v=>v.n+': '+v.t)]];
 const dxText=r=>(r.dx.ok?'Diagnosticado con '+r.dx.n+' pista'+(r.dx.n===1?'':'s')+' (×'+fmt(r.dx.mult)+')':'Sin diagnóstico')+(r.dx.wrong.length?'. Antes pensaste en: '+r.dx.wrong.map(id=>EBY[id].n).join(', '):'');
 function repCard(r){
- const d=EBY[r.id];
- return '<article class="rep"><header><span class="rw">'+r.where+'</span><h2>'+d.n+(r.boss?' <small>jefe</small>':'')+'</h2><span class="ro '+(r.out==='kill'?'good':'bad')+'">'+OUT[r.out]+'</span></header>'+
+ const d=caseOf(r.id,r.ci||0);
+ return '<article class="rep"><header><span class="rw">'+r.where+'</span><h2>'+d.n+' <small>'+d.cuadro+'</small>'+(r.boss?' <small>jefe</small>':'')+'</h2><span class="ro '+(r.out==='kill'?'good':'bad')+'">'+OUT[r.out]+'</span></header>'+
  '<p><b>Primera impresión:</b> '+r.sint+'</p>'+
  '<div class="rgrid">'+hcGroups(r).map(([t,a])=>'<div><h4>'+t+'</h4>'+(a.length?'<ul>'+a.map(x=>'<li>'+x+'</li>').join('')+'</ul>':'<p class="mute">No lo pediste.</p>')+'</div>').join('')+'</div>'+
  '<p class="'+(r.dx.ok?'good':'bad')+'"><b>Diagnóstico:</b> '+dxText(r)+'.</p>'+(r.dx.ok?'<p class="mute">'+d.clave+'.</p>':'')+
@@ -1047,8 +1834,8 @@ function repCard(r){
 }
 function repasoTxt(data){
  const L=['GUARDIA Z · Repaso de la partida ('+new Date(data.t).toLocaleString('es-AR')+')',(MODE[data.mode]||'')+' · XP '+data.xp+' · Bajas '+data.kills+' · Disparos errados '+data.misfires,''];
- data.hist.forEach((r,i)=>{const d=EBY[r.id],fi=d.ficha;
-  L.push('## '+(i+1)+'. '+r.where+' · '+d.n+(r.boss?' (jefe)':'')+' · '+OUT[r.out]);
+ data.hist.forEach((r,i)=>{const d=caseOf(r.id,r.ci||0),fi=d.ficha;
+  L.push('## '+(i+1)+'. '+r.where+' · '+d.n+' · '+d.cuadro+(r.boss?' (jefe)':'')+' · '+OUT[r.out]);
   L.push('Primera impresión: '+strip(r.sint));
   hcGroups(r).forEach(([t,a])=>{L.push(t+':'+(a.length?'':' (no lo pediste)'));a.forEach(x=>L.push('  - '+strip(x)))});
   L.push('Diagnóstico: '+dxText(r)+'.');
@@ -1117,7 +1904,7 @@ function renderHC(){
   grp('Laboratorio',h.lab.map((x,i)=>'<b>'+LABN[i]+':</b> '+x),P.lab.length,'Tecla S: tinción → cultivo → confirmatoria.')+
   grp('Factores de virulencia',h.vir.map(v=>'<b>'+v.n+'</b>: '+v.t),null,'Se anotan cuando te ataca.')+
   (e.wrong.length?'<div class="hcg"><h3>Descartados</h3><ul>'+e.wrong.map(id=>'<li>'+EBY[id].n+'</li>').join('')+'</ul></div>':'')+
-  (e.diag?'<div class="hcg dxok"><h3>Diagnóstico</h3><p>'+e.d.n+' · ×'+fmt(e.mult)+'</p></div>':'');
+  (e.diag?'<div class="hcg dxok"><h3>Diagnóstico</h3><p>'+e.d.n+' · '+e.d.cuadro+' · ×'+fmt(e.mult)+'</p></div>':'');
 }
 function render(){
  const e=S.enemy;
